@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="de" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>Rock Paper Scissors</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+          integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+</head>
+<body>
+<div class="pages">
+    <div class="header">
+        <h1>Schere Stein Papier</h1>
+    </div>
+    <div class="game page">
+        <div class="score-board">
+            <div id="user-label" class="badge">user</div>
+            <div id="computer-label" class="badge">comp</div>
+            <span id="user-score">0</span>:<span id="computer-score">0</span>
+        </div>
+        <div class="server-info">
+            <div id="user-online">0</div>
+        </div>
+        <!--<div class="player-online" style="height:120px;width:120px;border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:auto;">-->
+        <!--</div>-->
+        <div class="result">
+            <p>Good Luck! :D</p>
+        </div>
+        <div class="choices">
+            <div class="choice" id="s">
+                <i class="fas fa-hand-scissors fa-4x"></i>
+            </div>
+            <div class="choice" id="r">
+                <i class="fas fa-hand-rock fa-4x"></i>
+            </div>
+            <div class="choice" id="p">
+                <i class="fas fa-hand-paper fa-4x"></i>
+            </div>
+        </div>
+        <p id="action-message">Make your move</p>
+    </div>
+    <div class="login page">
+        <div class="form">
+            <h3 class="title">Wie ist dein Name?</h3>
+            <input class="usernameInput" type="text" maxlength="14"/>
+        </div>
+    </div>
+    <div class="lobby page">
+        <h3 class="title">Lobby</h3>
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script src="game.js" charset="utf-8"></script>
+<script src="main.js" charset="utf-8"></script>
+</body>
+</html>
