@@ -1,7 +1,7 @@
 # rps multiplayer node
 
 
-You can access it [here](rps.filzknoetche.de)
+You can access it [here](http://rps.filzknoetche.de)
 
 # Build Setup
 ```bash
