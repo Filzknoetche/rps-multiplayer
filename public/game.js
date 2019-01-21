@@ -23,8 +23,8 @@ $(function () {
         // If the username is valid
         if (username) {
             $loginPage.fadeOut();
-            $gamePage.show();
-            // $lobbyPage.show();
+            // $gamePage.show();
+            $lobbyPage.show();
             $loginPage.off('click');
             // Tell the server your username
             socket.emit('add user', username);
@@ -58,8 +58,6 @@ $(function () {
 // Whenever the server emits 'login', log the login message
     socket.on('login', (data) => {
         connected = true;
-        // Display the welcome message
-        // console.log("hi");
         addParticipantsMessage(data);
     });
 
@@ -74,5 +72,11 @@ $(function () {
         log(data.username + ' left');
         addParticipantsMessage(data);
     });
+
+$('#btnCreateGame').click(function () {
+    // console.log("lul");
+    socket.emit('hostCreateNewGame');
+});
+
 
 });

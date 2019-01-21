@@ -31,6 +31,7 @@ io.on('connection', (socket) => {
         socket.userid = userid;
         ++numUsers;
         addedUser = true;
+        process.stdout.write("" + numUsers +" users\r");
         socket.emit('login', {
             numUsers: numUsers
         });
@@ -46,6 +47,7 @@ io.on('connection', (socket) => {
     socket.on('disconnect', () => {
         if (addedUser) {
             --numUsers;
+            process.stdout.write("" + numUsers +" users\r");
             delete users[socket.id];
             // echo globally that this client has left
             socket.broadcast.emit('user left', {
@@ -54,4 +56,19 @@ io.on('connection', (socket) => {
             });
         }
     });
+
+    socket.on('hostCreateNewGame', hostCreateNewGame);
+
+    function hostCreateNewGame() {
+        // Create a unique Socket.IO Room
+
+        console.log("\nlalalalala");
+        var thisGameId = ( Math.random() * 100000 ) | 0;
+
+        // Return the Room ID (gameId) and the socket ID (mySocketId) to the browser client
+        socket.emit('newGameCreated', {gameId: thisGameId, mySocketId: socket.id});
+
+        // Join the Room and wait for the players
+        socket.join(thisGameId.toString());
+    };
 });

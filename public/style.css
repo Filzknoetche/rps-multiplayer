@@ -190,3 +190,14 @@ body {
     font-size: 200%;
     letter-spacing: 3px;
 }
+.lobby.page button{
+    color: white;
+    height: 100px;
+    position: absolute;
+    font-family: Asap, sans-serif;
+    text-align: center;
+    top: 50%;
+    width: 100%;
+    font-size: 200%;
+    letter-spacing: 3px;
+}
