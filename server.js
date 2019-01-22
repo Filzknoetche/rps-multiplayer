@@ -33,6 +33,9 @@ io.on('connection', (socket) => {
         addedUser = true;
         process.stdout.write("" + numUsers +" users\r");
         socket.emit('login', {
+            username: username,
+            id:userid,
+            sockid:socket.id,
             numUsers: numUsers
         });
         // echo globally (all clients) that a person has connected
@@ -58,17 +61,28 @@ io.on('connection', (socket) => {
     });
 
     socket.on('hostCreateNewGame', hostCreateNewGame);
+    socket.on('playerJoinGame', playerJoinGame);
 
     function hostCreateNewGame() {
         // Create a unique Socket.IO Room
 
-        console.log("\nlalalalala");
+        console.log("\nCreateNewGame");
         var thisGameId = ( Math.random() * 100000 ) | 0;
 
         // Return the Room ID (gameId) and the socket ID (mySocketId) to the browser client
         socket.emit('newGameCreated', {gameId: thisGameId, mySocketId: socket.id});
-
+        console.log(thisGameId);
         // Join the Room and wait for the players
         socket.join(thisGameId.toString());
     };
+    function playerJoinGame(data) {
+        var sock = this;
+        console.log('Player ' + data.username + " mit der id " + data.userid + " socketid " + data.id + " Will den Raum " + data.roomid + " beitreten");
+        socket.join(data.roomid);
+
+        //console.log('Player ' + data.playerName + ' joining game: ' + data.gameId );
+
+        // Emit an event notifying the clients that the player has joined the room.
+        io.sockets.in(data.roomid).emit('playerJoinedRoom', data);
+    }
 });

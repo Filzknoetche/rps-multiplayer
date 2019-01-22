@@ -46,9 +46,24 @@
         </div>
     </div>
     <div class="lobby page">
-        <h3 class="title">Lobby</h3>
         <button id="btnCreateGame" class="btn left">CREATE</button>
-
+        <button id="btnJoinGame" class="btn left">JOIN</button>
+    </div>
+    <div class="lobby-list page">
+        <h3 class="title">Lobby</h3>
+        <div class="info">
+            <label for="inputGameId">Game ID:</label>
+            <input id="inputGameId" type="text"/>
+        </div>
+        <div class="info buttons">
+            <button id="btnStart" class="btn">Start</button>
+            <div id="playerWaitingMessage"></div>
+        </div>
+    </div>
+    <div class="game-created page">
+        <h3 class="title" id="gameid-display">Lobby id</h3>
+        <p>Players: </p>
+        <p id="player-joined"></p>
     </div>
 </div>
 <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>

@@ -5,10 +5,15 @@ $(function () {
     var $loginPage = $('.login.page'); // The login page
     var $gamePage = $('.game.page'); // The login page
     var $lobbyPage = $('.lobby.page'); // The login page
+    var $gamecreatedPage = $('.game-created.page'); // The login page
+    var $lobbylistPage = $('.lobby-list.page'); // The login page
     var $userlabel = $('#user-label');
+    var $gameiddisplay = $('#gameid-display');
     var $currentInput = $usernameInput.focus();
     var useronline = $('#user-online');
     var username;
+    var userid;
+    var id;
     var connected = false;
     var socket = io();
 
@@ -58,6 +63,8 @@ $(function () {
 // Whenever the server emits 'login', log the login message
     socket.on('login', (data) => {
         connected = true;
+        userid = data.id;
+        id = data.sockid;
         addParticipantsMessage(data);
     });
 
@@ -72,11 +79,39 @@ $(function () {
         log(data.username + ' left');
         addParticipantsMessage(data);
     });
+    socket.on('playerJoinedRoom', (data) => {
+        console.log("Game joined");
+        $lobbyPage.hide();
 
-$('#btnCreateGame').click(function () {
-    // console.log("lul");
-    socket.emit('hostCreateNewGame');
-});
+    });
+
+    socket.on('newGameCreated', (data) => {
+        console.log("lulululu" + data);
+        $lobbyPage.hide();
+        $gamecreatedPage.show();
+        $gameiddisplay.html(data.gameId);
+    });
+
+
+    $('#btnCreateGame').click(function () {
+        // console.log("lul");
+        socket.emit('hostCreateNewGame');
+    });
+    $('#btnJoinGame').click(function () {
+        // socket.emit('hostCreateNewGame');
+        $lobbyPage.hide();
+        $lobbylistPage.show();
+    });
+    $('#btnStart').click(function () {
+        var data = {
+            username: username,
+            userid: userid,
+            id: id,
+            roomid: $('#inputGameId').val()
+        }
+        socket.emit('playerJoinGame', data);
+        $lobbylistPage.hide();
+    });
 
 
 });
