@@ -66,18 +66,18 @@ io.on('connection', (socket) => {
     function hostCreateNewGame() {
         // Create a unique Socket.IO Room
 
-        console.log("\nCreateNewGame");
+        // console.log("\nCreateNewGame");
         var thisGameId = ( Math.random() * 100000 ) | 0;
 
         // Return the Room ID (gameId) and the socket ID (mySocketId) to the browser client
         socket.emit('newGameCreated', {gameId: thisGameId, mySocketId: socket.id});
-        console.log(thisGameId);
+        // console.log(thisGameId);
         // Join the Room and wait for the players
         socket.join(thisGameId.toString());
     };
     function playerJoinGame(data) {
         var sock = this;
-        console.log('Player ' + data.username + " mit der id " + data.userid + " socketid " + data.id + " Will den Raum " + data.roomid + " beitreten");
+        // console.log('Player ' + data.username + " mit der id " + data.userid + " socketid " + data.id + " Will den Raum " + data.roomid + " beitreten");
         socket.join(data.roomid);
 
         //console.log('Player ' + data.playerName + ' joining game: ' + data.gameId );

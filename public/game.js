@@ -17,6 +17,8 @@ $(function () {
     var connected = false;
     var socket = io();
 
+
+
     const addParticipantsMessage = (data) => {
         // console.log(data.numUsers);
         useronline.html(data.numUsers);
@@ -57,8 +59,8 @@ $(function () {
     });
     // Log a message
     const log = (message, options) => {
-        console.log(message);
-    }
+        // console.log(message);
+    };
 
 // Whenever the server emits 'login', log the login message
     socket.on('login', (data) => {
@@ -79,17 +81,22 @@ $(function () {
         log(data.username + ' left');
         addParticipantsMessage(data);
     });
+
     socket.on('playerJoinedRoom', (data) => {
         console.log("Game joined");
         $lobbyPage.hide();
-
+        updateWaitingScreen(data);
+        usersInRoom++;
+        console.log(usersInRoom);
     });
 
     socket.on('newGameCreated', (data) => {
-        console.log("lulululu" + data);
         $lobbyPage.hide();
         $gamecreatedPage.show();
         $gameiddisplay.html(data.gameId);
+        let usersInRoom = 0;
+        usersInRoom++;
+        console.log(usersInRoom);
     });
 
 
@@ -113,5 +120,11 @@ $(function () {
         $lobbylistPage.hide();
     });
 
+    function updateWaitingScreen(data) {
+        console.log(data);
+        $('#playersWaiting')
+            .append('<p/>')
+            .text('Player ' + data.username + ' joined the game.');
+    }
 
 });
