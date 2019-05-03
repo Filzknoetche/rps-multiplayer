@@ -213,10 +213,6 @@ body {
     font-size: 200%;
     letter-spacing: 3px;
 }
-#btnJoinGame{
-    position: absolute;
-    margin-top: -100px;
-}
 .lobby-list.page{
     display: none;
 }
@@ -315,4 +311,153 @@ body {
 .lobby-create.page .title, .lobby-create.page .lobbyNameInput {
     color: #fff;
     font-weight: 100;
+}
+
+.roomlist-view{
+    position: absolute;
+    width: 100%;
+    height: calc(100% - 110px);
+    margin-top: 5px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.dialog, .room-view>.container {
+    background-color: #1A2125;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px;
+    overflow: hidden;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+.roomlist-view>.dialog, .room-view.roomlist-view>.container {
+    position: relative;
+    min-height: 0;
+    max-width: 650px;
+    max-height: 700px;
+    height: 100%;
+    width: 100%;
+    color: #fff;
+}
+.dialog>:not(:last-child), .room-view>.container>:not(:last-child) {
+    margin-bottom: 6px;
+}
+.dialog>h1, .room-view>.container>h1 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px !important;
+    padding-top: 6px;
+    padding-bottom: 5px;
+    border-bottom: 3px;
+    border-bottom-color: #c13535;
+    border-bottom-style: solid;
+}
+.roomlist-view>.dialog>.splitter, .room-view.roomlist-view>.container>.splitter {
+    min-height: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    flex: 1;
+}
+.roomlist-view>.dialog>.splitter, .room-view.roomlist-view>.container>.splitter {
+    min-height: 0;
+    display: flex;
+    flex-direction: row;
+    align-items: stretch;
+    flex: 1;
+}
+.dialog>:not(:last-child), .room-view>.container>:not(:last-child) {
+    margin-bottom: 6px;
+}
+.roomlist-view>.dialog>.splitter>.list, .room-view.roomlist-view>.container>.splitter>.list {
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.roomlist-view>.dialog>.splitter>.list .separator, .room-view.roomlist-view>.container>.splitter>.list .separator {
+    height: 2px;
+    width: 100%;
+    background-color: gray;
+}
+.roomlist-view>.dialog>.splitter>.list, .room-view.roomlist-view>.container>.splitter>.list {
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+.roomlist-view>.dialog>.splitter>:not(:last-child), .room-view.roomlist-view>.container>.splitter>:not(:last-child) {
+    margin-right: 6px;
+}
+.roomlist-view>.dialog>.splitter>.list table.header, .room-view.roomlist-view>.container>.splitter>.list table.header {
+    width: calc(100% - 12px);
+    margin-right: 15px;
+    flex: 0;
+    background-color: #1A2125;
+}
+.roomlist-view>.dialog>.splitter>.list table, .room-view.roomlist-view>.container>.splitter>.list table {
+    table-layout: fixed;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+.roomlist-view>.dialog>.splitter>.list .content, .room-view.roomlist-view>.container>.splitter>.list .content {
+    position: relative;
+    overflow: hidden;
+    flex: 1;
+}
+.ps {
+    overflow: hidden !important;
+    overflow-anchor: none;
+    -ms-overflow-style: none;
+    touch-action: auto;
+    -ms-touch-action: auto;
+}
+.roomlist-view>.dialog>.splitter>.list .content table, .room-view.roomlist-view>.container>.splitter>.list .content table {
+    margin-top: 5px;
+    width: calc(100% - 12px);
+}
+.roomlist-view>.dialog>.splitter>.list table, .room-view.roomlist-view>.container>.splitter>.list table {
+    table-layout: fixed;
+}
+.roomlist-view>.dialog>.splitter>.list tbody tr, .room-view.roomlist-view>.container>.splitter>.list tbody tr {
+    line-height: 22px;
+}
+.roomlist-view>.dialog>.splitter>.buttons, .room-view.roomlist-view>.container>.splitter>.buttons {
+    display: flex;
+    flex-direction: column;
+    flex: 0 0 auto;
+    align-items: stretch;
+}
+.roomlist-view>.dialog>.splitter>.buttons>:not(:last-child), .room-view.roomlist-view>.container>.splitter>.buttons>:not(:last-child) {
+    margin-bottom: 6px;
+}
+.roomlist-view>.dialog>.splitter>.buttons>button, .room-view.roomlist-view>.container>.splitter>.buttons>button {
+    padding-left: 10px;
+    display: flex;
+}
+.dialog button, .room-view>.container button {
+    background-color: #244967;
+}
+.roomlist-view>.dialog>.splitter>.buttons>.spacer, .room-view.roomlist-view>.container>.splitter>.buttons>.spacer {
+    flex: 1;
+    margin-bottom: 0px;
+}
+.roomlist-view>.dialog>.splitter>.list tbody tr.selected, .room-view.roomlist-view>.container>.splitter>.list tbody tr.selected {
+    background-color: #3a4952;
+}
+.roomlist-view>.dialog>.splitter>.list td, .room-view.roomlist-view>.container>.splitter>.list td {
+    white-space: nowrap;
+    overflow: hidden;
+}
+.roomlist-view>.dialog>.splitter>.list td:not(:first-child), .room-view.roomlist-view>.container>.splitter>.list td:not(:first-child) {
+    padding-left: 6px;
 }

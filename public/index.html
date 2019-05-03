@@ -1,50 +1,101 @@
 <!DOCTYPE html>
 <html lang="de" dir="ltr">
+
 <head>
     <meta charset="utf-8">
     <title>Rock Paper Scissors</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
-          integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
-          <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
+
 <body>
-<div class="pages">
-    <div class="header">
-        <h1>Schere Stein Papier</h1>
-        <div id="user-online">Online: <span>0</span></div>
-        <div id="room"></div>
-    </div>
-    <div class="login page">
-        <div class="form">
-            <h3 class="title">Wie ist dein Name?</h3>
-            <input class="usernameInput" type="text" maxlength="14"/>
+    <div class="pages">
+        <div class="header">
+            <h1>Schere Stein Papier</h1>
+            <div id="user-online">Online: <span>0</span></div>
+            <div id="room"></div>
         </div>
-    </div>
-    <div class="lobby page" style="display: none;">
-            <div class="lobby-container">
-                
-                <div class="lobby-menu">
-                    <button id="btnCreateGame" class="btn btn-secondary left">CREATE</button>
-                    <button id="btnJoinGame" class="btn btn-secondary left">JOIN</button>                
-                </div>
-                <div class="lobby-list">
-                        <ul>
-                            <!-- <li>Raum-1(1/2)</li>
-                            <li>Raum-2(2/2)</li>
-                            <li>Raum-3</li> -->
-                        </ul>
-                    </div>
+        <div class="login page">
+            <div class="form">
+                <h3 class="title">Wie ist dein Name?</h3>
+                <input class="usernameInput" type="text" maxlength="14" />
             </div>
-    </div>
-    <div class="lobby-create page">
+        </div>
+        <div class="roomlist-view" style="display: none;">
+            <div class="dialog">
+                <h1>Room list</h1>
+                <p>Hallo</p>
+                <div class="splitter">
+                    <div class="list">
+                        <table class="header">
+                            <colgroup>
+                                <col>
+                                <col>
+                                <col>
+                                <col>
+                            </colgroup>
+                            <thead>
+                                <tr>
+                                    <td>Name</td>
+                                    <td>Players</td>
+                                    <td>Pass</td>
+                                    <td>Host</td>
+                                </tr>
+                            </thead>
+                        </table>
+                        <div class="separator"></div>
+                        <div class="content ps ps-active-y">
+                            <table>
+                                <colgroup>
+                                    <col>
+                                    <col>
+                                    <col>
+                                    <col>
+                                </colgroup>
+                                <tbody>
+                                    <tr class="selected">
+                                        <td>
+                                            <span data-hook="tag"></span>
+                                            <span data-hook="name">lul</span>
+                                        </td>
+                                        <td data-hook="players">1/2</td>
+                                        <td data-hook="pass">Yes</td>
+                                        <td>Filzknoetche</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="buttons">
+                        <button id="btnJoinGame" class="btn btn-primary">Join Room</button>
+                        <button id="btnCreateGame" class="btn btn-primary">Create Room</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="lobby-create page">
             <div class="form">
                 <h3 class="title">Lobbyname?</h3>
-                <input class="lobbyNameInput" type="text" maxlength="14"/><br>
+                <input class="lobbyNameInput" type="text" maxlength="14" /><br>
                 <button id="btnCreateRoom" class="btn btn-primary">Erstellen</button>
-            </div> 
-    </div>
-    <div class="game page">
+            </div>
+        </div>
+        <div class="lobby-list page">
+                <h3 class="title">Lobby</h3>
+                <div class="info">
+                    <label for="inputGameId">Game ID:</label>
+                    <input id="inputGameId" type="text"/>
+                </div>
+                <div class="info buttons">
+                    <button id="btnJoin" class="btn">Beitreten</button>
+        
+                </div>
+            </div>
+        
+        <div class="game page">
             <div class="score-board">
                 <div id="user-label" class="badge1">user</div>
                 <div id="computer-label" class="badge1">Waiting...</div>
@@ -66,10 +117,10 @@
             </div>
             <p id="action-message">Make your move</p>
         </div>
-    
-</div>
-<script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="game.js" charset="utf-8"></script>
+    </div>
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="game.js" charset="utf-8"></script>
 </body>
+
 </html>

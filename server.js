@@ -67,12 +67,14 @@ io.on('connection', (socket) => {
 
     function hostCreateNewGame(data) {
         // Create a unique Socket.IO Room
-
+        console.log(data);
+        
         // console.log("\nCreateNewGame");
         let thisGameId = ( Math.random() * 100000 ) | 0;
 
         // Return the Room ID (gameId) and the socket ID (mySocketId) to the browser client
         socket.emit('newGameCreated', {gameId: thisGameId, mySocketId: data.id, roomname: data.roomname});
+        io.in(thisGameId).emit('big-announcement', 'the game will start soon');
         // console.log(thisGameId);
         io.emit('update-lobbylist', {gameId: thisGameId, mySocketId: data.id, roomname: data.roomname});
         // Join the Room and wait for the players
@@ -80,13 +82,15 @@ io.on('connection', (socket) => {
     };
 
     function playerJoinGame(data) {
-        let sock = this;
-        // console.log('Player ' + data.username + " mit der id " + data.userid + " socketid " + data.id + " Will den Raum " + data.roomid + " beitreten");
-        socket.join(data.roomid);
-
-        //console.log('Player ' + data.playerName + ' joining game: ' + data.gameId );
-
-        // Emit an event notifying the clients that the player has joined the room.
-        io.sockets.in(data.roomid).emit('playerJoinedRoom', data);
+        console.log(data);
+        
+        var room = io.nsps['/'].adapter.rooms[data.room];
+        if (room && room.length === 1) {
+            socket.join(data.room);
+            socket.broadcast.to(data.room).emit('player1', {});
+            socket.emit('player2', { name: data.name, room: data.room })
+        } else {
+            socket.emit('err', { message: 'Sorry, The room is full!' });
+        }
     }
 });

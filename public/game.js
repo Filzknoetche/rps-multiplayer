@@ -9,7 +9,9 @@ $(function () {
     let $lobbycreatePage = $('.lobby-create.page');
     let $gamecreatedPage = $('.game-created.page'); // The login page
     let $lobbylistPage = $('.lobby-list.page'); // The login page
+    let $roomlistview = $('.roomlist-view');
     let $userlabel = $('#user-label');
+    let $opponentLabel = $('#computer-label');
     let $gameiddisplay = $('#gameid-display');
     let $currentInput = $usernameInput.focus();
     let useronline = $('#user-online span');
@@ -22,6 +24,7 @@ $(function () {
     const P2 = '1';
     let player;
     let game;
+    let roomName;
     let socket = io();
 
     class Player {
@@ -64,13 +67,24 @@ $(function () {
 
     // roomId Id of the room in which the game is running on the server.
     class Game {
-        constructor(roomId) {
+        constructor(roomId, roomName) {
             this.roomId = roomId;
+            this.roomName = roomName;
             this.board = [];
             this.moves = 0;
         }
         getRoomId() {
             return this.roomId;
+        }
+        getRoomName(){
+            return this.roomName;
+        }
+        // Remove the menu from DOM, display the gameboard and greet the player.
+        displayBoard(message) {
+            $opponentLabel.html(player.getPlayerName());
+            $gamePage.show();
+            
+            //this.createGameBoard();
         }
 
     }
@@ -86,14 +100,13 @@ $(function () {
     const setUsername = () => {
         username = cleanInput($usernameInput.val().trim());
         // If the username is valid
-        if (username && username.length >= 1) {
+        if (username && username.length >= 1 && username.length < 15) {
             $loginPage.fadeOut();
             // $gamePage.show();
-            $lobbyPage.show();
+            $roomlistview.show();
             $loginPage.off('click');
             // Tell the server your username
             socket.emit('add user', username);
-            $userlabel.html(username);
         } else {
             console.log("Inkorrekter Benutzername");
             console.log(username.length);
@@ -113,7 +126,13 @@ $(function () {
         }
         // When the client hits ENTER on their keyboard
         if (event.which === 13) {
-            setUsername();
+            // console.log(event);
+            // console.log(event.target.className);
+            if (event.target.className === "usernameInput") {
+                setUsername();
+            }
+            
+            
         }
     });
     socket.on('disconnect', () => {
@@ -150,44 +169,48 @@ $(function () {
         console.log("Game joined");
         $lobbyPage.hide();
         updateWaitingScreen(data);
-        usersInRoom++;
-        console.log(usersInRoom);
     });
 
     socket.on('newGameCreated', (data) => {
-        game = new Game(data.gameId);
+        game = new Game(data.gameId, data.roomname);
         $lobbycreatePage.hide();
         $gamePage.show();
+        $userlabel.html(player.getPlayerName());
         $roomNameAndId.html(data.roomname+"/"+data.gameId);
+        
         let usersInRoom = 0;
         usersInRoom++;
-        console.log(usersInRoom);
+        //console.log(usersInRoom);
     });
 
     socket.on('update-lobbylist', (data) => {
-        console.log(data);
+        // console.log("update-lobbylist");
+        // console.log(data);
         //$('#lobby-list').append('<p/>').text('Raum ' + data.roomname + ' joined the game.');
         $(".lobby-list ul").append('<li>' + data.roomname + '</li>');
     });
 
     $('#btnCreateGame').click(function () {
-        $lobbyPage.hide();
+        $roomlistview.hide();
         $lobbycreatePage.show();
     });
     $('#btnJoinGame').click(function () {
         // socket.emit('hostCreateNewGame');
-        $lobbyPage.hide();
+        $roomlistview.hide();
         $lobbylistPage.show();
     });
     $('#btnCreateRoom').click(function () {
         roomname = cleanInput($roomnameInput.val().trim());
+        game = new Game(id, roomname);
         if (roomname.length >= 1) {
             var data = {
                 username: player.getPlayerName(),
                 roomname: roomname,
-                id: id
+                id: id,
+                game
             }
-            console.log(data);
+            // console.log("btnCreateroom");
+            // console.log(data);
             socket.emit('hostCreateNewGame', data);
         }else{
             console.log("Raumname zu kurz");
@@ -195,22 +218,59 @@ $(function () {
         
 
     });
-    $('#btnStart').click(function () {
-        var data = {
-            username: username,
-            userid: userid,
-            id: id,
-            roomid: $('#inputGameId').val()
+    $('#btnJoin').click(function () {
+        const name = username;
+        const roomID = $('#inputGameId').val();
+        if (!name || !roomID) {
+            alert('Please enter your name and game ID.');
+            return;
         }
-        socket.emit('playerJoinGame', data);
+        var data = {
+            username: name,
+            roomid: roomID
+        }
+        
+        socket.emit('playerJoinGame', { name, room: roomID });
+        player = new Player(name, P2);
         $lobbylistPage.hide();
     });
 
     function updateWaitingScreen(data) {
+        console.log("updateWaitingScreen");
+        
         console.log(data);
         $('#playersWaiting')
             .append('<p/>')
             .text('Player ' + data.username + ' joined the game.');
     }
+    socket.on('player1', (data) => {
+        const message = `Hello, ${player.getPlayerName()}`;
+        console.log(message);
+        
+        //$('#userHello').html(message);
+        //player.setCurrentTurn(true);
+      });
+    
+      /**
+         * Joined the game, so player is P2(O). 
+         * This event is received when P2 successfully joins the game room. 
+         */
+      socket.on('player2', (data) => {
+        console.log(data);
+        
+        const message = `Hello, ${data.name}`;
+        console.log(message);
+        // Create game for player 2
+        game = new Game(data.room);
+        console.log(game);
+        
+        game.displayBoard(message);
+        //player.setCurrentTurn(false);
+      });
 
+      //TEST
+      socket.on('big-announcement', (data) =>{
+        console.log(data);
+        
+      });
 });
