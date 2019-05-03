@@ -1,89 +1,92 @@
 $(function () {
-    var FADE_TIME = 150; // ms
-    var $window = $(window);
-    var $usernameInput = $('.usernameInput'); // Input for username
+    let FADE_TIME = 150; // ms
+    let $window = $(window);
+    let $usernameInput = $('.usernameInput'); // Input for username
     let $roomnameInput = $('.lobbyNameInput');
-    var $loginPage = $('.login.page'); // The login page
-    var $gamePage = $('.game.page'); // The login page
-    var $lobbyPage = $('.lobby.page'); // The login page
+    let $loginPage = $('.login.page'); // The login page
+    let $gamePage = $('.game.page'); // The login page
+    let $lobbyPage = $('.lobby.page'); // The login page
     let $lobbycreatePage = $('.lobby-create.page');
-    var $gamecreatedPage = $('.game-created.page'); // The login page
-    var $lobbylistPage = $('.lobby-list.page'); // The login page
-    var $userlabel = $('#user-label');
-    var $gameiddisplay = $('#gameid-display');
-    var $currentInput = $usernameInput.focus();
-    var useronline = $('#user-online');
-    var username;
-    var userid;
-    var id;
-    var connected = false;
+    let $gamecreatedPage = $('.game-created.page'); // The login page
+    let $lobbylistPage = $('.lobby-list.page'); // The login page
+    let $userlabel = $('#user-label');
+    let $gameiddisplay = $('#gameid-display');
+    let $currentInput = $usernameInput.focus();
+    let useronline = $('#user-online span');
+    let $roomNameAndId = $('#room');
+    let username;
+    let userid;
+    let id;
+    let connected = false;
     const P1 = '0';
     const P2 = '1';
     let player;
     let game;
-    var socket = io();
+    let socket = io();
 
     class Player {
         constructor(name, type) {
-          this.name = name;
-          this.type = type;
-          this.currentTurn = true;
-          this.playsArr = 0;
+            this.name = name;
+            this.type = type;
+            this.currentTurn = true;
+            this.playsArr = 0;
         }
-    
+
         // Set the bit of the move played by the player
         // tileValue - Bitmask used to set the recently played move.
         updatePlaysArr(tileValue) {
-          this.playsArr += tileValue;
+            this.playsArr += tileValue;
         }
-    
+
         getPlaysArr() {
-          return this.playsArr;
+            return this.playsArr;
         }
-    
+
         // Set the currentTurn for player to turn and update UI to reflect the same.
         setCurrentTurn(turn) {
-          this.currentTurn = turn;
-          const message = turn ? 'Your turn' : 'Waiting for Opponent';
-          $('#turn').text(message);
+            this.currentTurn = turn;
+            const message = turn ? 'Your turn' : 'Waiting for Opponent';
+            $('#turn').text(message);
         }
-    
+
         getPlayerName() {
-          return this.name;
+            return this.name;
         }
-    
+
         getPlayerType() {
-          return this.type;
+            return this.type;
         }
-    
+
         getCurrentTurn() {
-          return this.currentTurn;
+            return this.currentTurn;
         }
-      }
-
-      // roomId Id of the room in which the game is running on the server.
-  class Game {
-    constructor(roomId) {
-      this.roomId = roomId;
-      this.board = [];
-      this.moves = 0;
-    }
-    getRoomId() {
-        return this.roomId;
     }
 
-  }
+    // roomId Id of the room in which the game is running on the server.
+    class Game {
+        constructor(roomId) {
+            this.roomId = roomId;
+            this.board = [];
+            this.moves = 0;
+        }
+        getRoomId() {
+            return this.roomId;
+        }
+
+    }
 
     const addParticipantsMessage = (data) => {
-        // console.log(data.numUsers);
         useronline.html(data.numUsers);
     }
+    socket.on('userconnected', (data) => {
+        useronline.html(data);
+    });
 
-// Sets the client's username
+    // Sets the client's username
     const setUsername = () => {
         username = cleanInput($usernameInput.val().trim());
         // If the username is valid
-        if (username) {
+        if (username && username.length >= 1) {
             $loginPage.fadeOut();
             // $gamePage.show();
             $lobbyPage.show();
@@ -91,10 +94,14 @@ $(function () {
             // Tell the server your username
             socket.emit('add user', username);
             $userlabel.html(username);
+        } else {
+            console.log("Inkorrekter Benutzername");
+            console.log(username.length);
+
         }
     };
 
-// Prevents input from having injected markup
+    // Prevents input from having injected markup
     const cleanInput = (input) => {
         return $('<div/>').text(input).html();
     };
@@ -117,7 +124,7 @@ $(function () {
         //console.log(message);
     };
 
-// Whenever the server emits 'login', log the login message
+    // Whenever the server emits 'login', log the login message
     socket.on('login', (data) => {
         connected = true;
         userid = data.id;
@@ -151,7 +158,7 @@ $(function () {
         game = new Game(data.gameId);
         $lobbycreatePage.hide();
         $gamePage.show();
-        $gameiddisplay.html(data.gameId);
+        $roomNameAndId.html(data.roomname+"/"+data.gameId);
         let usersInRoom = 0;
         usersInRoom++;
         console.log(usersInRoom);
@@ -160,12 +167,10 @@ $(function () {
     socket.on('update-lobbylist', (data) => {
         console.log(data);
         //$('#lobby-list').append('<p/>').text('Raum ' + data.roomname + ' joined the game.');
-        $(".lobby-list ul").append('<li>'+data.roomname+'</li>');
+        $(".lobby-list ul").append('<li>' + data.roomname + '</li>');
     });
 
     $('#btnCreateGame').click(function () {
-        // console.log("lul");
-        //socket.emit('hostCreateNewGame');
         $lobbyPage.hide();
         $lobbycreatePage.show();
     });
@@ -174,15 +179,20 @@ $(function () {
         $lobbyPage.hide();
         $lobbylistPage.show();
     });
-    $('#btnCreateRoom').click(function(){
+    $('#btnCreateRoom').click(function () {
         roomname = cleanInput($roomnameInput.val().trim());
-        var data = {
-            username: player.getPlayerName(),
-            roomname: roomname,
-            id: id
+        if (roomname.length >= 1) {
+            var data = {
+                username: player.getPlayerName(),
+                roomname: roomname,
+                id: id
+            }
+            console.log(data);
+            socket.emit('hostCreateNewGame', data);
+        }else{
+            console.log("Raumname zu kurz");
         }
-        console.log(data);
-        socket.emit('hostCreateNewGame', data);
+        
 
     });
     $('#btnStart').click(function () {

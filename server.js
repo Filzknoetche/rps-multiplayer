@@ -1,10 +1,10 @@
 // Setup basic express server
-var express = require('express');
-var app = express();
-var path = require('path');
-var server = require('http').createServer(app);
-var io = require('socket.io')(server);
-var port = process.env.PORT || 3003;
+let express = require('express');
+let app = express();
+let path = require('path');
+let server = require('http').createServer(app);
+let io = require('socket.io')(server);
+let port = process.env.PORT || 3003;
 
 server.listen(port, () => {
     console.log('Server listening at port %d', port);
@@ -12,17 +12,17 @@ server.listen(port, () => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-var userid;
-var numUsers = 0;
-var id = 1;
-var users = {};
+let userid;
+let numUsers = 0;
+let id = 1;
+let users = {};
 
 io.on('connection', (socket) => {
     let addedUser = false;
-
+    socket.emit('userconnected', numUsers);
     // when the client emits 'add user', this listens and executes
     socket.on('add user', (username) => {
-        console.log(username);
+        //console.log(username);
         
         if (addedUser) return;
         userid = id;
@@ -69,7 +69,7 @@ io.on('connection', (socket) => {
         // Create a unique Socket.IO Room
 
         // console.log("\nCreateNewGame");
-        var thisGameId = ( Math.random() * 100000 ) | 0;
+        let thisGameId = ( Math.random() * 100000 ) | 0;
 
         // Return the Room ID (gameId) and the socket ID (mySocketId) to the browser client
         socket.emit('newGameCreated', {gameId: thisGameId, mySocketId: data.id, roomname: data.roomname});
@@ -80,7 +80,7 @@ io.on('connection', (socket) => {
     };
 
     function playerJoinGame(data) {
-        var sock = this;
+        let sock = this;
         // console.log('Player ' + data.username + " mit der id " + data.userid + " socketid " + data.id + " Will den Raum " + data.roomid + " beitreten");
         socket.join(data.roomid);
 

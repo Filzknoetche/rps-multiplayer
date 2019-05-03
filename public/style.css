@@ -48,12 +48,24 @@ body {
 #user-online{
     position: absolute;
     font-family: Asap, sans-serif;
-    color: white;
+    color: #000;
+    background-color: #fff;
     font-size: 32px;
     top: 25px;
     left: 25px;
 }
-
+#user-online span{
+    background-color: #fff;
+}
+#room{
+    position: absolute;
+    font-family: Asap, sans-serif;
+    color: #000;
+    background-color: #fff;
+    font-size: 32px;
+    top: 25px;
+    right: 25px;
+}
 #user-label {
     position: absolute;
     top: 30px;
