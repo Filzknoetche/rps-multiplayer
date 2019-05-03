@@ -37,7 +37,7 @@ body {
     position: relative;
 }
 
-.badge {
+.badge1 {
     background: #E2584D;
     color: white;
     font-size: 14px;
@@ -229,12 +229,78 @@ body {
 .title{
     color: white;
     height: 100px;
-    margin-top: -200px;
+    width: 100%;
+    font-size: 200%;
+    letter-spacing: 3px;
+}
+
+.lobby.page{
+    color: #fff;
+}
+/*
+.lobby.page{
+     Text zentrieren 
+    text-align:center;
+     
+    /* Inhalt vertikal mittig platzieren 
+    display: -webkit-flex;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-align-items: center;
+    -webkit-box-align: center;
+    -ms-flex-align: center;
+    align-items: center;
+    
+}
+
+.lobby.page .lobby-container{
+    background-color: #fff;
+    height: 400px;
+    width: 800px;
+    margin: 0 auto;
+}
+.lobby.page .lobby-container .lobby-menu{
+    background-color: #288002;
+    margin-left: 600px;
+    width: 200px;
+    height: 400px;
+}
+*/
+
+.lobby-create.page{
+    display: none;
+}
+.lobby-create.page .form {
+    height: 100px;
+    margin-top: -100px;
     position: absolute;
     font-family: Asap, sans-serif;
     text-align: center;
     top: 50%;
     width: 100%;
+}
+
+.lobby-create.page .form .lobbyNameInput {
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid #fff;
+    outline: none;
+    padding-bottom: 15px;
+    text-align: center;
+    width: 400px;
+}
+
+.lobby-create.page .title {
+    font-size: 200%;
+}
+
+.lobby-create.page .lobbyNameInput {
     font-size: 200%;
     letter-spacing: 3px;
+}
+
+.lobby-create.page .title, .lobby-create.page .lobbyNameInput {
+    color: #fff;
+    font-weight: 100;
 }

@@ -6,38 +6,12 @@
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
           integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+          <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 </head>
 <body>
 <div class="pages">
     <div class="header">
         <h1>Schere Stein Papier</h1>
-    </div>
-    <div class="game page">
-        <div class="score-board">
-            <div id="user-label" class="badge">user</div>
-            <div id="computer-label" class="badge">Waiting...</div>
-            <span id="user-score">0</span>:<span id="computer-score">0</span>
-        </div>
-        <div class="server-info">
-            <div id="user-online">0</div>
-        </div>
-        <!--<div class="player-online" style="height:120px;width:120px;border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:auto;">-->
-        <!--</div>-->
-        <div class="result">
-            <p>Waiting for opponent...</p>
-        </div>
-        <div class="choices">
-            <div class="choice" id="s">
-                <i class="fas fa-hand-scissors fa-4x"></i>
-            </div>
-            <div class="choice" id="r">
-                <i class="fas fa-hand-rock fa-4x"></i>
-            </div>
-            <div class="choice" id="p">
-                <i class="fas fa-hand-paper fa-4x"></i>
-            </div>
-        </div>
-        <p id="action-message">Make your move</p>
     </div>
     <div class="login page">
         <div class="form">
@@ -45,29 +19,60 @@
             <input class="usernameInput" type="text" maxlength="14"/>
         </div>
     </div>
-    <div class="lobby page">
-        <button id="btnCreateGame" class="btn left">CREATE</button>
-        <button id="btnJoinGame" class="btn left">JOIN</button>
+    <div class="lobby page" style="display: none;">
+            <div class="lobby-container">
+                
+                <div class="lobby-menu">
+                    <button id="btnCreateGame" class="btn btn-secondary left">CREATE</button>
+                    <button id="btnJoinGame" class="btn btn-secondary left">JOIN</button>                
+                </div>
+                <div class="lobby-list">
+                        <ul>
+                            <!-- <li>Raum-1(1/2)</li>
+                            <li>Raum-2(2/2)</li>
+                            <li>Raum-3</li> -->
+                        </ul>
+                    </div>
+            </div>
     </div>
-    <div class="lobby-list page">
-        <h3 class="title">Lobby</h3>
-        <div class="info">
-            <label for="inputGameId">Game ID:</label>
-            <input id="inputGameId" type="text"/>
+    <div class="lobby-create page">
+            <div class="form">
+                <h3 class="title">Lobbyname?</h3>
+                <input class="lobbyNameInput" type="text" maxlength="14"/><br>
+                <button id="btnCreateRoom" class="btn btn-primary">Erstellen</button>
+            </div> 
+    </div>
+    <div class="game page">
+            <div class="score-board">
+                <div id="user-label" class="badge1">user</div>
+                <div id="computer-label" class="badge1">Waiting...</div>
+                <span id="user-score">0</span>:<span id="computer-score">0</span>
+            </div>
+            <div class="server-info">
+                <div id="user-online">0</div>
+            </div>
+            <!--<div class="player-online" style="height:120px;width:120px;border:1px solid #ccc;font:16px/26px Georgia, Garamond, Serif;overflow:auto;">-->
+            <!--</div>-->
+            <div class="result">
+                <p>Waiting for opponent...</p>
+            </div>
+            <div class="choices">
+                <div class="choice" id="s">
+                    <i class="fas fa-hand-scissors fa-4x"></i>
+                </div>
+                <div class="choice" id="r">
+                    <i class="fas fa-hand-rock fa-4x"></i>
+                </div>
+                <div class="choice" id="p">
+                    <i class="fas fa-hand-paper fa-4x"></i>
+                </div>
+            </div>
+            <p id="action-message">Make your move</p>
         </div>
-        <div class="info buttons">
-            <button id="btnStart" class="btn">Start</button>
-
-        </div>
-    </div>
-    <div class="game-created page">
-        <h3 class="title" id="gameid-display">Lobby id</h3>
-        <div id="playersWaiting"></div>
-    </div>
+    
 </div>
 <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="game.js" charset="utf-8"></script>
-<script src="main.js" charset="utf-8"></script>
 </body>
 </html>
