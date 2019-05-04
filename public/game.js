@@ -28,8 +28,9 @@ $(function () {
     let socket = io();
 
     class Player {
-        constructor(name, type) {
+        constructor(name, type, id) {
             this.name = name;
+            this.id = id;
             this.type = type;
             this.currentTurn = true;
             this.playsArr = 0;
@@ -54,6 +55,9 @@ $(function () {
 
         getPlayerName() {
             return this.name;
+        }
+        getPlayerId(){
+            return this.id;
         }
 
         getPlayerType() {
@@ -93,7 +97,7 @@ $(function () {
         useronline.html(data.numUsers);
     }
     socket.on('userconnected', (data) => {
-        useronline.html(data);
+        useronline.html(data.numUsers);
     });
 
     // Sets the client's username
@@ -103,13 +107,12 @@ $(function () {
         if (username && username.length >= 1 && username.length < 15) {
             $loginPage.fadeOut();
             // $gamePage.show();
-            $roomlistview.show();
+            $roomlistview.fadeIn();
             $loginPage.off('click');
             // Tell the server your username
             socket.emit('add user', username);
         } else {
             console.log("Inkorrekter Benutzername");
-            console.log(username.length);
 
         }
     };
@@ -145,18 +148,22 @@ $(function () {
 
     // Whenever the server emits 'login', log the login message
     socket.on('login', (data) => {
+        console.log(data.user);
+        
         connected = true;
         userid = data.id;
         id = data.sockid;
         username = data.username;
         addParticipantsMessage(data);
-        player = new Player(data.username, P1);
+        player = new Player(data.username, P1, userid);
+        console.log(player);
     });
 
     // Whenever the server emits 'user joined', log it in the chat body
     socket.on('user joined', (data) => {
         log(data.username + ' joined');
         addParticipantsMessage(data);
+
     });
 
     // Whenever the server emits 'user left', log it in the chat body
@@ -184,9 +191,10 @@ $(function () {
     });
 
     socket.on('update-lobbylist', (data) => {
-        // console.log("update-lobbylist");
-        // console.log(data);
+        //console.log("update-lobbylist");
+        console.log(data);
         //$('#lobby-list').append('<p/>').text('Raum ' + data.roomname + ' joined the game.');
+        $('.content table tbody').append('<tr><td>'+data.roomname+'</td><td>1/2</td><td>Ja</td><td>'+data.username+'</td></tr>')
         $(".lobby-list ul").append('<li>' + data.roomname + '</li>');
     });
 
@@ -237,7 +245,7 @@ $(function () {
 
     function updateWaitingScreen(data) {
         console.log("updateWaitingScreen");
-        
+        $('.game.page.result p').html("test");
         console.log(data);
         $('#playersWaiting')
             .append('<p/>')
@@ -246,7 +254,8 @@ $(function () {
     socket.on('player1', (data) => {
         const message = `Hello, ${player.getPlayerName()}`;
         console.log(message);
-        
+        console.log(data);
+        $opponentLabel.html(data.name);
         //$('#userHello').html(message);
         //player.setCurrentTurn(true);
       });
@@ -263,13 +272,20 @@ $(function () {
         // Create game for player 2
         game = new Game(data.room);
         console.log(game);
-        
+        $userlabel.html(data.room.owner);
+        $roomNameAndId.html(data.room.roomname+"/"+data.room.id);
         game.displayBoard(message);
+        $('#resultLabel').html("test");
         //player.setCurrentTurn(false);
       });
 
       //TEST
       socket.on('big-announcement', (data) =>{
+        console.log(data);
+        
+      });
+
+      socket.on('err', (data)=>{
         console.log(data);
         
       });

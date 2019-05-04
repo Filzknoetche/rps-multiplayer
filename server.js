@@ -16,10 +16,11 @@ let userid;
 let numUsers = 0;
 let id = 1;
 let users = {};
+let rooms = {};
 
 io.on('connection', (socket) => {
     let addedUser = false;
-    socket.emit('userconnected', numUsers);
+    socket.emit('userconnected', {numUsers: numUsers, rooms: rooms});
     // when the client emits 'add user', this listens and executes
     socket.on('add user', (username) => {
         //console.log(username);
@@ -38,7 +39,8 @@ io.on('connection', (socket) => {
             username: username,
             id:userid,
             sockid:socket.id,
-            numUsers: numUsers
+            numUsers: numUsers,
+            user: users
         });
         // echo globally (all clients) that a person has connected
         socket.broadcast.emit('user joined', {
@@ -76,19 +78,27 @@ io.on('connection', (socket) => {
         socket.emit('newGameCreated', {gameId: thisGameId, mySocketId: data.id, roomname: data.roomname});
         io.in(thisGameId).emit('big-announcement', 'the game will start soon');
         // console.log(thisGameId);
-        io.emit('update-lobbylist', {gameId: thisGameId, mySocketId: data.id, roomname: data.roomname});
+        io.emit('update-lobbylist', {gameId: thisGameId, mySocketId: data.id, roomname: data.roomname, username: data.username});
         // Join the Room and wait for the players
         socket.join(thisGameId.toString());
+        rooms[thisGameId] = {id: thisGameId, roomname: data.roomname, owner: data.username};
     };
 
     function playerJoinGame(data) {
         console.log(data);
+        console.log(rooms[data.room]);
+        
+        console.log(rooms[data.room]);
+        
+        
         
         var room = io.nsps['/'].adapter.rooms[data.room];
         if (room && room.length === 1) {
+            let test1 = rooms[data.room];
+            Object.assign(test1, {opponent: data.name});
             socket.join(data.room);
-            socket.broadcast.to(data.room).emit('player1', {});
-            socket.emit('player2', { name: data.name, room: data.room })
+            socket.broadcast.to(data.room).emit('player1', {name: data.name, room: test1});
+            socket.emit('player2', { name: data.name, id: data.room, room: test1});
         } else {
             socket.emit('err', { message: 'Sorry, The room is full!' });
         }
