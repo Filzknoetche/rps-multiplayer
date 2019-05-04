@@ -14,13 +14,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 let userid;
 let numUsers = 0;
+let numRooms = 0;
 let id = 1;
 let users = {};
 let rooms = {};
 
 io.on('connection', (socket) => {
     let addedUser = false;
-    socket.emit('userconnected', {numUsers: numUsers, rooms: rooms});
+    socket.emit('userconnected', {numUsers: numUsers, rooms: rooms, numRooms: numRooms});
     // when the client emits 'add user', this listens and executes
     socket.on('add user', (username) => {
         //console.log(username);
@@ -28,7 +29,7 @@ io.on('connection', (socket) => {
         if (addedUser) return;
         userid = id;
         id++;
-        users[socket.id] = {id:userid, sockid:socket.id, username:username};
+        users[socket.id] = {id:userid, sockid:socket.id, username:username, inGame: false};
         // we store the username in the socket session for this client
         socket.username = username;
         socket.userid = userid;
@@ -53,13 +54,27 @@ io.on('connection', (socket) => {
     // when the user disconnects.. perform this
     socket.on('disconnect', () => {
         if (addedUser) {
+            let userroom;
             --numUsers;
             //process.stdout.write("" + numUsers +" users\r");
+            if (users[socket.id].inGame) {
+                for (let roomid in rooms) {
+                    if (rooms[roomid].id == socket.id) {
+                        userroom = rooms[roomid];
+                        delete rooms[roomid];
+                        --numRooms;
+                    }
+                }
+                
+            }
             delete users[socket.id];
+            
             // echo globally that this client has left
             socket.broadcast.emit('user left', {
                 username: socket.username,
-                numUsers: numUsers
+                numUsers: numUsers,
+                numRooms: numRooms,
+                room: userroom
             });
         }
     });
@@ -71,27 +86,27 @@ io.on('connection', (socket) => {
         // Create a unique Socket.IO Room
         console.log(data);
         
-        // console.log("\nCreateNewGame");
         let thisGameId = ( Math.random() * 100000 ) | 0;
-
+        rooms[thisGameId] = {id: data.id, roomid: thisGameId, roomname: data.roomname, owner: data.username};
+        ++numRooms;
+        let user = users[socket.id];
+        user.inGame = true;
+        //Object.assign(user, {opponent: data.name});
         // Return the Room ID (gameId) and the socket ID (mySocketId) to the browser client
         socket.emit('newGameCreated', {gameId: thisGameId, mySocketId: data.id, roomname: data.roomname});
         io.in(thisGameId).emit('big-announcement', 'the game will start soon');
         // console.log(thisGameId);
-        io.emit('update-lobbylist', {gameId: thisGameId, mySocketId: data.id, roomname: data.roomname, username: data.username});
+        io.emit('update-lobbylist', {rooms: rooms[thisGameId], numRooms: numRooms});
         // Join the Room and wait for the players
         socket.join(thisGameId.toString());
-        rooms[thisGameId] = {id: thisGameId, roomname: data.roomname, owner: data.username};
+        
     };
 
     function playerJoinGame(data) {
-        console.log(data);
-        console.log(rooms[data.room]);
+        // console.log(data);
+        // console.log(rooms[data.room]);
         
-        console.log(rooms[data.room]);
-        
-        
-        
+        // console.log(rooms[data.room]);
         var room = io.nsps['/'].adapter.rooms[data.room];
         if (room && room.length === 1) {
             let test1 = rooms[data.room];

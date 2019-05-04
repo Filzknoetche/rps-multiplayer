@@ -4,10 +4,9 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    background-color: #292C34;
 }
 
-body {
+html {
     background-color: #292C34;
 }
 
@@ -460,10 +459,9 @@ table {
     margin-bottom: 0px;
 }
 .roomlist-view>.dialog>.splitter>.list tbody tr.selected, .room-view.roomlist-view>.container>.splitter>.list tbody tr.selected {
-    background-color: #3a4952 !important;
+    background-color: #3a4952;
 }
 .roomlist-view>.dialog>.splitter>.list td, .room-view.roomlist-view>.container>.splitter>.list td {
-    background-color: #1A2125;
     white-space: nowrap;
     overflow: hidden;
 }
@@ -471,7 +469,19 @@ table {
     padding-left: 6px;
 }
 .roomlist-view>.dialog>.splitter>.list td span, .room-view.roomlist-view>.container>.splitter>.list td span {
-    background-color: #1A2125;
     white-space: nowrap;
     overflow: hidden;
+}
+#serverinfo{
+    position: absolute;
+    top: 20px;
+    right: 12px;
+}
+#serverinfo #user-online{
+    font-size: unset;
+    position: unset;
+    color: unset;
+    background-color: unset;
+    top: 25px;
+    left: unset;
 }

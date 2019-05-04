@@ -15,6 +15,7 @@ $(function () {
     let $gameiddisplay = $('#gameid-display');
     let $currentInput = $usernameInput.focus();
     let useronline = $('#user-online span');
+    let usersonline = $('#users-online');
     let $roomNameAndId = $('#room');
     let username;
     let userid;
@@ -95,9 +96,19 @@ $(function () {
 
     const addParticipantsMessage = (data) => {
         useronline.html(data.numUsers);
+        usersonline.html(data.numUsers);
+    }
+    const addRooms = (data) => {
+        $('#rooms-online').html(data.numRooms);
     }
     socket.on('userconnected', (data) => {
-        useronline.html(data.numUsers);
+        addParticipantsMessage(data);
+        addRooms(data);
+        console.log(data);
+        
+        for (let roomid in data.rooms) {
+            $('#rooms').append('<tr><td style="display: none">'+data.rooms.roomid+'</td><td>'+data.rooms[roomid].roomname+'</td><td>1/2</td><td>Nein</td><td>'+data.rooms[roomid].owner+'</td></tr>');
+          }
     });
 
     // Sets the client's username
@@ -148,15 +159,12 @@ $(function () {
 
     // Whenever the server emits 'login', log the login message
     socket.on('login', (data) => {
-        console.log(data.user);
-        
         connected = true;
         userid = data.id;
         id = data.sockid;
         username = data.username;
         addParticipantsMessage(data);
         player = new Player(data.username, P1, userid);
-        console.log(player);
     });
 
     // Whenever the server emits 'user joined', log it in the chat body
@@ -168,8 +176,15 @@ $(function () {
 
     // Whenever the server emits 'user left', log it in the chat body
     socket.on('user left', (data) => {
+        console.log(data);
+        
         log(data.username + ' left');
         addParticipantsMessage(data);
+        addRooms(data);
+        if (data.room != null) {
+            $('#rooms tr').remove( ":contains("+ data.room.roomid +")");
+        }
+        
     });
 
     socket.on('playerJoinedRoom', (data) => {
@@ -191,11 +206,10 @@ $(function () {
     });
 
     socket.on('update-lobbylist', (data) => {
-        //console.log("update-lobbylist");
         console.log(data);
-        //$('#lobby-list').append('<p/>').text('Raum ' + data.roomname + ' joined the game.');
-        $('.content table tbody').append('<tr><td>'+data.roomname+'</td><td>1/2</td><td>Ja</td><td>'+data.username+'</td></tr>')
-        $(".lobby-list ul").append('<li>' + data.roomname + '</li>');
+        
+        $('#rooms').append('<tr><td style="display: none">'+data.rooms.roomid+'</td><td>'+data.rooms.roomname+'</td><td>1/2</td><td>Nein</td><td>'+data.rooms.owner+'</td></tr>');
+        $('#rooms-online').html(data.numRooms);
     });
 
     $('#btnCreateGame').click(function () {
@@ -243,19 +257,28 @@ $(function () {
         $lobbylistPage.hide();
     });
 
+    $('#userTable').on('click', 'tbody tr', function(event) {
+        console.log( $( this ).text() );
+        
+        $(this).addClass('selected').siblings().removeClass('selected');
+    });
+
+    $('#userTable').on('dblclick', 'tbody tr', function(event) {
+        //console.log("lulullu");
+    });
     function updateWaitingScreen(data) {
         console.log("updateWaitingScreen");
-        $('.game.page.result p').html("test");
+        $('#resultLabel').html("Das Spiel kann beginnen");
+        setInterval(function(){$('#resultLabel').html(""); }, 3000);
         console.log(data);
-        $('#playersWaiting')
-            .append('<p/>')
-            .text('Player ' + data.username + ' joined the game.');
+        
     }
     socket.on('player1', (data) => {
         const message = `Hello, ${player.getPlayerName()}`;
         console.log(message);
         console.log(data);
         $opponentLabel.html(data.name);
+        updateWaitingScreen(data);
         //$('#userHello').html(message);
         //player.setCurrentTurn(true);
       });
@@ -266,7 +289,7 @@ $(function () {
          */
       socket.on('player2', (data) => {
         console.log(data);
-        
+        updateWaitingScreen(data);
         const message = `Hello, ${data.name}`;
         console.log(message);
         // Create game for player 2
@@ -275,7 +298,7 @@ $(function () {
         $userlabel.html(data.room.owner);
         $roomNameAndId.html(data.room.roomname+"/"+data.room.id);
         game.displayBoard(message);
-        $('#resultLabel').html("test");
+        
         //player.setCurrentTurn(false);
       });
 
