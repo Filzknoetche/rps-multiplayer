@@ -120,9 +120,12 @@ io.on('connection', (socket) => {
     }
 
     socket.on('playTurn', (data) => {
+        console.log(data);
+        
         socket.broadcast.to(data.room).emit('turnPlayed', {
             choice: data.choice,
-            room: data.room
+            room: data.room,
+            player: data.player
         });
     });
 });

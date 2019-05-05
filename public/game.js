@@ -83,6 +83,9 @@ $(function () {
         constructor(roomId, roomName) {
             this.roomId = roomId;
             this.roomName = roomName;
+            this.choices = [];
+            this.p1choice;
+            this.p2choice;
             this.board = [];
             this.moves = 0;
         }
@@ -99,24 +102,45 @@ $(function () {
             this.createGameBoard();
         }
 
+        updateBoard(type, choice) {
+            //console.log(type + " " + choice);
+            this.choices.push(choice);
+            if (type == P1) {
+                this.p1choice = choice;
+            }
+            if (type == P2) {
+                this.p2choice = choice;
+            }
+            
+            this.moves++;
+          }
+
         playTurn(choice) {
             // Emit an event to update other player that you've played your turn.
-            console.log("Roomid: " + this.getRoomId());
+            if (player.getPlayerType() == P1) {
+                //console.log("Spieler 1 : " + choice);
+                this.p1choice = choice;
+            }
+            if (player.getPlayerType() == P2) {
+                //console.log("Spieler 2 : " + choice);
+                this.p2choice = choice;
+            }
             
             socket.emit('playTurn', {
                 choice: choice,
                 room: this.getRoomId(),
+                player: player.getPlayerType()
             });
         }
 
         createGameBoard() {
             function tileClickHandler(choice) {
               if (!player.getCurrentTurn() || !game) {
-                console.log('Its not your turn!');
+                //console.log('Its not your turn!');
                 return;
               }
             
-              console.log(choice);
+              //console.log(choice);
               
               document.getElementById(choice).classList.add('green-glow');
               
@@ -127,7 +151,7 @@ $(function () {
               player.setCurrentTurn(false);
               //player.updatePlaysArr(1 << ((row * 3) + col));
       
-              //game.checkWinner();
+              game.checkWinner();
             }
       
             paper_div.click(function(){
@@ -141,6 +165,38 @@ $(function () {
             });
           }
 
+          checkWinner() {
+            const currentPlayerPositions = player.getPlaysArr();
+      
+            //console.log(currentPlayerPositions);
+            console.log(game);
+            console.log(game.p1choice);
+            console.log(game.p2choice);
+            if (game.p1choice != null && game.p2choice) {
+                console.log(game.p1choice + " " + game.p2choice);
+                switch (game.p1choice + game.p2choice) {
+                    case "rs":
+                    case "pr":
+                    case "sp":
+                        //win(userChoice, computerChoice);
+                        console.log("P1 win");
+                        break;
+                    case "rp":
+                    case "ps":
+                    case "sr":
+                        //lose(userChoice, computerChoice);
+                        console.log("P2 win");
+                        break;
+                    case "rr":
+                    case "pp":
+                    case "ss":
+                        //draw(userChoice, computerChoice);
+                        console.log("DRAW");
+                        break;
+                }
+            }
+            
+          }
           
     }
 
@@ -225,7 +281,7 @@ $(function () {
 
     // Whenever the server emits 'user left', log it in the chat body
     socket.on('user left', (data) => {
-        console.log(data);
+        //console.log(data);
         
         log(data.username + ' left');
         addParticipantsMessage(data);
@@ -237,7 +293,7 @@ $(function () {
     });
 
     socket.on('playerJoinedRoom', (data) => {
-        console.log("Game joined");
+        //console.log("Game joined");
         $lobbyPage.hide();
         updateWaitingScreen(data);
     });
@@ -259,19 +315,20 @@ $(function () {
     });
 
     socket.on('update-lobbylist', (data) => {
-        console.log(data);
+        //console.log(data);
         
         $('#rooms').append('<tr><td data-room='+data.rooms.roomid+' style="display: none">'+data.rooms.roomid+'</td><td>'+data.rooms.roomname+'</td><td>1/2</td><td>Nein</td><td>'+data.rooms.owner+'</td></tr>');
         $('#rooms-online').html(data.numRooms);
     });
 
     socket.on('turnPlayed', (data) => {
-        const opponentType = player.getPlayerType() === P1 ? P2 : P1;
-        console.log(opponentType);
+        //console.log(data);
         
-        //game.updateBoard(opponentType, row, col, data.tile);
+        const opponentType = player.getPlayerType() === P1 ? P2 : P1;
+        //console.log(opponentType);
+        game.updateBoard(opponentType, data.choice);
         player.setCurrentTurn(true);
-        console.log(player);
+        //console.log(player);
         
       });
 
@@ -335,15 +392,15 @@ $(function () {
         $roomlistview.hide();
     });
     function updateWaitingScreen(data) {
-        console.log("updateWaitingScreen");
+        //console.log("updateWaitingScreen");
         $('#resultLabel').html("Das Spiel kann beginnen");
-        console.log(data);
+        //console.log(data);
         
     }
     socket.on('player1', (data) => {
         const message = `Hello, ${player.getPlayerName()}`;
-        console.log(message);
-        console.log(data);
+        //console.log(message);
+        //console.log(data);
         $opponentLabel.html(data.name);
         updateWaitingScreen(data);
         player.setCurrentTurn(true);
@@ -354,13 +411,13 @@ $(function () {
          * This event is received when P2 successfully joins the game room. 
          */
       socket.on('player2', (data) => {
-        console.log(data);
+        //console.log(data);
         updateWaitingScreen(data);
         const message = `Hello, ${data.name}`;
-        console.log(message);
+        //console.log(message);
         // Create game for player 2
         game = new Game(data.room.roomid, data.room.roomname);
-        console.log(game);
+        //console.log(game);
         $userlabel.html(data.room.owner);
         $roomNameAndId.html(data.room.roomname+"/"+data.room.roomid);
         game.displayBoard(message);
