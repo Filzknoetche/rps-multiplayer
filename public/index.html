@@ -68,13 +68,24 @@
                 <p id="serverinfo"><span id="users-online">1342</span> Spieler in <span id="rooms-online">257</span> Räumen</p>
             </div>
         </div>
-        <div class="lobby-create page">
-            <div class="form">
-                <h3 class="title">Lobbyname?</h3>
-                <input class="lobbyNameInput" type="text" maxlength="14" /><br>
-                <button id="btnCreateRoom" class="btn btn-primary">Erstellen</button>
+        
+        <div class="create-room-view" style="display:none;">
+            <div class="dialog">
+                <h1>Create room</h1>
+                <div class="label-input">
+                    <label>Room name:</label>
+                    <input id="lobbyNameInput" required="" maxlength="40">
+                </div>
+                <div class="label-input">
+                    <label>Password:</label>
+                    <input id="lobbyPasswordInput" maxlength="30">
+                </div>
+                    <div class="row-btn">
+                        <button data-hook="cancel">Cancel</button>
+                        <button id="btnCreateRoom">Create</button>
+                    </div>
+                </div>
             </div>
-        </div>
         <div class="lobby-list page">
                 <h3 class="title">Lobby</h3>
                 <div class="info">

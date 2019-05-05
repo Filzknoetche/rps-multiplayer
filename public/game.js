@@ -2,11 +2,13 @@ $(function () {
     let FADE_TIME = 150; // ms
     let $window = $(window);
     let $usernameInput = $('.usernameInput'); // Input for username
-    let $roomnameInput = $('.lobbyNameInput');
+    let $roomnameInput = $('#lobbyNameInput');
+    let $roompasswordInput = $('#lobbyPasswordInput');
     let $loginPage = $('.login.page'); // The login page
     let $gamePage = $('.game.page'); // The login page
     let $lobbyPage = $('.lobby.page'); // The login page
     let $lobbycreatePage = $('.lobby-create.page');
+    let $createroomview = $('.create-room-view');
     let $gamecreatedPage = $('.game-created.page'); // The login page
     let $lobbylistPage = $('.lobby-list.page'); // The login page
     let $roomlistview = $('.roomlist-view');
@@ -107,8 +109,8 @@ $(function () {
         console.log(data);
         
         for (let roomid in data.rooms) {
-            $('#rooms').append('<tr><td style="display: none">'+data.rooms.roomid+'</td><td>'+data.rooms[roomid].roomname+'</td><td>1/2</td><td>Nein</td><td>'+data.rooms[roomid].owner+'</td></tr>');
-          }
+            $('#rooms').append('<tr><td data-room='+data.rooms[roomid].roomid+'>'+data.rooms[roomid].roomname+'</td><td>1/2</td><td>Nein</td><td>'+data.rooms[roomid].owner+'</td></tr>');
+        }
     });
 
     // Sets the client's username
@@ -195,7 +197,7 @@ $(function () {
 
     socket.on('newGameCreated', (data) => {
         game = new Game(data.gameId, data.roomname);
-        $lobbycreatePage.hide();
+        $createroomview.hide();
         $gamePage.show();
         $userlabel.html(player.getPlayerName());
         $roomNameAndId.html(data.roomname+"/"+data.gameId);
@@ -208,13 +210,13 @@ $(function () {
     socket.on('update-lobbylist', (data) => {
         console.log(data);
         
-        $('#rooms').append('<tr><td style="display: none">'+data.rooms.roomid+'</td><td>'+data.rooms.roomname+'</td><td>1/2</td><td>Nein</td><td>'+data.rooms.owner+'</td></tr>');
+        $('#rooms').append('<tr><td data-room='+data.rooms.roomid+'>'+data.rooms.roomname+'</td><td>1/2</td><td>Nein</td><td>'+data.rooms.owner+'</td></tr>');
         $('#rooms-online').html(data.numRooms);
     });
 
     $('#btnCreateGame').click(function () {
         $roomlistview.hide();
-        $lobbycreatePage.show();
+        $createroomview.show();
     });
     $('#btnJoinGame').click(function () {
         // socket.emit('hostCreateNewGame');
@@ -264,7 +266,11 @@ $(function () {
     });
 
     $('#userTable').on('dblclick', 'tbody tr', function(event) {
-        //console.log("lulullu");
+        const name = username;
+        const roomID = $(this).children().data("room");
+        socket.emit('playerJoinGame', { name, room: roomID });
+        player = new Player(name, P2);
+        $roomlistview.hide();
     });
     function updateWaitingScreen(data) {
         console.log("updateWaitingScreen");
@@ -296,7 +302,7 @@ $(function () {
         game = new Game(data.room);
         console.log(game);
         $userlabel.html(data.room.owner);
-        $roomNameAndId.html(data.room.roomname+"/"+data.room.id);
+        $roomNameAndId.html(data.room.roomname+"/"+data.room.roomid);
         game.displayBoard(message);
         
         //player.setCurrentTurn(false);
