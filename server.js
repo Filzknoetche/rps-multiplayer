@@ -84,10 +84,10 @@ io.on('connection', (socket) => {
 
     function hostCreateNewGame(data) {
         // Create a unique Socket.IO Room
-        console.log(data);
+        //console.log(data);
         
         let thisGameId = ( Math.random() * 100000 ) | 0;
-        rooms[thisGameId] = {id: data.id, roomid: thisGameId, roomname: data.roomname, owner: data.username};
+        rooms[thisGameId] = {id: data.id, roomid: thisGameId, roomname: data.roomname, owner: data.username, password: data.roompassword};
         ++numRooms;
         let user = users[socket.id];
         user.inGame = true;
@@ -118,4 +118,11 @@ io.on('connection', (socket) => {
             socket.emit('err', { message: 'Sorry, The room is full!' });
         }
     }
+
+    socket.on('playTurn', (data) => {
+        socket.broadcast.to(data.room).emit('turnPlayed', {
+            choice: data.choice,
+            room: data.room
+        });
+    });
 });

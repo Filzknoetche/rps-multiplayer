@@ -28,6 +28,9 @@ $(function () {
     let player;
     let game;
     let roomName;
+    const rock_div = $("#r");
+    const paper_div = $("#p");
+    const scissors_div = $("#s");
     let socket = io();
 
     class Player {
@@ -35,7 +38,7 @@ $(function () {
             this.name = name;
             this.id = id;
             this.type = type;
-            this.currentTurn = true;
+            this.currentTurn = false;
             this.playsArr = 0;
         }
 
@@ -52,8 +55,11 @@ $(function () {
         // Set the currentTurn for player to turn and update UI to reflect the same.
         setCurrentTurn(turn) {
             this.currentTurn = turn;
-            const message = turn ? 'Your turn' : 'Waiting for Opponent';
-            $('#turn').text(message);
+            const message = turn ? 'Dein Zug' : 'Warte bis dein Gegner seine Auswahl getroffen hat!';
+            //$('#turn').text(message);
+            $('#resultLabel').html(message);
+            console.log(message);
+            
         }
 
         getPlayerName() {
@@ -88,12 +94,54 @@ $(function () {
         }
         // Remove the menu from DOM, display the gameboard and greet the player.
         displayBoard(message) {
-            $opponentLabel.html(player.getPlayerName());
             $gamePage.show();
             
-            //this.createGameBoard();
+            this.createGameBoard();
         }
 
+        playTurn(choice) {
+            // Emit an event to update other player that you've played your turn.
+            console.log("Roomid: " + this.getRoomId());
+            
+            socket.emit('playTurn', {
+                choice: choice,
+                room: this.getRoomId(),
+            });
+        }
+
+        createGameBoard() {
+            function tileClickHandler(choice) {
+              if (!player.getCurrentTurn() || !game) {
+                console.log('Its not your turn!');
+                return;
+              }
+            
+              console.log(choice);
+              
+              document.getElementById(choice).classList.add('green-glow');
+              
+              // Update board after your turn.
+              game.playTurn(choice);
+            //   game.updateBoard(player.getPlayerType(), row, col, this.id);
+      
+              player.setCurrentTurn(false);
+              //player.updatePlaysArr(1 << ((row * 3) + col));
+      
+              //game.checkWinner();
+            }
+      
+            paper_div.click(function(){
+                tileClickHandler("p");
+            });
+            scissors_div.click(function(){
+                tileClickHandler("s");
+            });
+            rock_div.click(function(){
+                tileClickHandler("r");
+            });
+          }
+
+          
     }
 
     const addParticipantsMessage = (data) => {
@@ -106,10 +154,9 @@ $(function () {
     socket.on('userconnected', (data) => {
         addParticipantsMessage(data);
         addRooms(data);
-        console.log(data);
         
         for (let roomid in data.rooms) {
-            $('#rooms').append('<tr><td data-room='+data.rooms[roomid].roomid+'>'+data.rooms[roomid].roomname+'</td><td>1/2</td><td>Nein</td><td>'+data.rooms[roomid].owner+'</td></tr>');
+            $('#rooms').append('<tr><td data-room='+data.rooms[roomid].roomid+' style="display: none">'+data.rooms[roomid].roomid+'</td><td>'+data.rooms[roomid].roomname+'</td><td>1/2</td><td>Nein</td><td>'+data.rooms[roomid].owner+'</td></tr>');
         }
     });
 
@@ -196,9 +243,13 @@ $(function () {
     });
 
     socket.on('newGameCreated', (data) => {
+        const message =
+        `Hello, ${data.name}. Please ask your friend to enter Game ID: 
+        ${data.room}. Waiting for player 2...`;
         game = new Game(data.gameId, data.roomname);
+        game.displayBoard(message);
         $createroomview.hide();
-        $gamePage.show();
+        //$gamePage.show();
         $userlabel.html(player.getPlayerName());
         $roomNameAndId.html(data.roomname+"/"+data.gameId);
         
@@ -210,13 +261,24 @@ $(function () {
     socket.on('update-lobbylist', (data) => {
         console.log(data);
         
-        $('#rooms').append('<tr><td data-room='+data.rooms.roomid+'>'+data.rooms.roomname+'</td><td>1/2</td><td>Nein</td><td>'+data.rooms.owner+'</td></tr>');
+        $('#rooms').append('<tr><td data-room='+data.rooms.roomid+' style="display: none">'+data.rooms.roomid+'</td><td>'+data.rooms.roomname+'</td><td>1/2</td><td>Nein</td><td>'+data.rooms.owner+'</td></tr>');
         $('#rooms-online').html(data.numRooms);
     });
+
+    socket.on('turnPlayed', (data) => {
+        const opponentType = player.getPlayerType() === P1 ? P2 : P1;
+        console.log(opponentType);
+        
+        //game.updateBoard(opponentType, row, col, data.tile);
+        player.setCurrentTurn(true);
+        console.log(player);
+        
+      });
 
     $('#btnCreateGame').click(function () {
         $roomlistview.hide();
         $createroomview.show();
+        $roomnameInput.val(player.getPlayerName());
     });
     $('#btnJoinGame').click(function () {
         // socket.emit('hostCreateNewGame');
@@ -225,11 +287,13 @@ $(function () {
     });
     $('#btnCreateRoom').click(function () {
         roomname = cleanInput($roomnameInput.val().trim());
-        game = new Game(id, roomname);
+        roompassword = cleanInput($roompasswordInput.val().trim());
+        console.log(roompassword);
         if (roomname.length >= 1) {
             var data = {
                 username: player.getPlayerName(),
                 roomname: roomname,
+                roompassword: roompassword,
                 id: id,
                 game
             }
@@ -260,8 +324,6 @@ $(function () {
     });
 
     $('#userTable').on('click', 'tbody tr', function(event) {
-        console.log( $( this ).text() );
-        
         $(this).addClass('selected').siblings().removeClass('selected');
     });
 
@@ -275,7 +337,6 @@ $(function () {
     function updateWaitingScreen(data) {
         console.log("updateWaitingScreen");
         $('#resultLabel').html("Das Spiel kann beginnen");
-        setInterval(function(){$('#resultLabel').html(""); }, 3000);
         console.log(data);
         
     }
@@ -285,8 +346,7 @@ $(function () {
         console.log(data);
         $opponentLabel.html(data.name);
         updateWaitingScreen(data);
-        //$('#userHello').html(message);
-        //player.setCurrentTurn(true);
+        player.setCurrentTurn(true);
       });
     
       /**
@@ -299,19 +359,13 @@ $(function () {
         const message = `Hello, ${data.name}`;
         console.log(message);
         // Create game for player 2
-        game = new Game(data.room);
+        game = new Game(data.room.roomid, data.room.roomname);
         console.log(game);
         $userlabel.html(data.room.owner);
         $roomNameAndId.html(data.room.roomname+"/"+data.room.roomid);
         game.displayBoard(message);
-        
-        //player.setCurrentTurn(false);
-      });
-
-      //TEST
-      socket.on('big-announcement', (data) =>{
-        console.log(data);
-        
+        $opponentLabel.html(player.getPlayerName());
+        player.setCurrentTurn(false);
       });
 
       socket.on('err', (data)=>{
