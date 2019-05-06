@@ -386,8 +386,12 @@ $(function() {
       }
       if (data.winner == "draw") {
         result_p.innerHTML = `${convertToWord(data.p1choice)}${smallP1Word} gleich ${convertToWord(data.p2choice)}${smallP2Word}. Unentschieden.`;
-        document.getElementById(data.p1choice).classList.remove('gray-glow');
-        document.getElementById(data.p2choice).classList.remove('gray-glow');
+        document.getElementById(data.p2choice).classList.add('gray-glow');
+        document.getElementById(data.p1choice).classList.add('gray-glow');
+        setTimeout(function () {
+            document.getElementById(data.p2choice).classList.remove('gray-glow');
+            document.getElementById(data.p1choice).classList.remove('gray-glow');
+        }, 1000);
       }
       p1Score_span.html(data.p1score);
       p2Score_span.html(data.p2score);
