@@ -578,3 +578,85 @@ table {
     font-size: 15px;
     line-height: 100%;
 }
+
+.room-password-view {
+    position: absolute;
+    width: 100%;
+    height: 85%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.room-password-view>.dialog, .room-view.room-password-view>.container {
+    width: 300px;
+}
+.dialog, .room-view>.container {
+    background-color: #1A2125;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px;
+    overflow: hidden;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+.dialog>h1, .room-view>.container>h1 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 20px !important;
+    padding-top: 6px;
+    padding-bottom: 5px;
+    border-bottom: 3px;
+    border-bottom-color: #c13535;
+    border-bottom-style: solid;
+    color: #fff;
+}
+.dialog .label-input, .room-view>.container .label-input {
+    display: flex;
+    background-color: #244967;
+    align-items: unset;
+    border-radius: 5px;
+    padding: 3px 3px 3px 5px;
+}
+.dialog>:not(:last-child), .room-view>.container>:not(:last-child) {
+    margin-bottom: 6px;
+}
+.room-password-view>.dialog>.label-input>label, .room-view.room-password-view>.container>.label-input>label {
+    flex: 0 0 auto;
+    margin-bottom: unset;
+}
+.dialog .label-input>*, .room-view>.container .label-input>* {
+    flex: 1;
+}
+.dialog input, .room-view>.container input {
+    min-width: 10px;
+}
+.dialog input, .room-view>.container input {
+    color: white;
+    background-color: #111619;
+    border: none;
+    border-radius: 5px;
+    padding: 0 10px;
+    box-sizing: border-box;
+    border: 1px solid #111619;
+}
+.room-password-view>.dialog .buttons, .room-view.room-password-view>.container .buttons {
+    display: flex;
+}
+.room-password-view>.dialog .buttons>:not(:last-child), .room-view.room-password-view>.container .buttons>:not(:last-child) {
+    margin-right: 6px;
+}
+.room-password-view>.dialog .buttons>*, .room-view.room-password-view>.container .buttons>* {
+    flex: 1;
+    white-space: nowrap;
+}
+.dialog button, .room-view>.container button {
+    background-color: #244967;
+}
+.room-password-view>.dialog .buttons>*, .room-view.room-password-view>.container .buttons>* {
+    flex: 1;
+    white-space: nowrap;
+}
+.dialog button:disabled, .room-view>.container button:disabled {
+    background-color: #3e3e3e;
+}

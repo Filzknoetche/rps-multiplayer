@@ -7,6 +7,7 @@ $(function() {
   let $gamePage = $(".game.page");
   let $lobbyPage = $(".lobby.page"); 
   let $createroomview = $(".create-room-view");
+  let $roompasswordview = $('#room-password-view');
   let $lobbylistPage = $(".lobby-list.page");
   let $roomlistview = $(".roomlist-view");
   let $userlabel = $("#user-label");
@@ -223,6 +224,7 @@ $(function() {
     addRooms(data);
 
     for (let roomid in data.rooms) {
+        let pw = data.rooms.password == "" ? "Nein" : "ja";
       $("#rooms").append(
         "<tr><td data-room=" +
           data.rooms[roomid].roomid +
@@ -230,7 +232,7 @@ $(function() {
           data.rooms[roomid].roomid +
           "</td><td>" +
           data.rooms[roomid].roomname +
-          "</td><td>1/2</td><td>Nein</td><td>" +
+          "</td><td>1/2</td><td>"+pw+"</td><td>" +
           data.rooms[roomid].owner +
           "</td></tr>"
       );
@@ -322,6 +324,9 @@ $(function() {
   });
 
   socket.on("update-lobbylist", data => {
+      console.log(data);
+      let pw = data.rooms.password == "" ? "Nein" : "ja";
+      
     $("#rooms").append(
       "<tr><td data-room=" +
         data.rooms.roomid +
@@ -329,7 +334,7 @@ $(function() {
         data.rooms.roomid +
         "</td><td>" +
         data.rooms.roomname +
-        "</td><td>1/2</td><td>Nein</td><td>" +
+        "</td><td>1/2</td><td>"+pw+"</td><td>" +
         data.rooms.owner +
         "</td></tr>"
     );
@@ -437,9 +442,16 @@ $(function() {
     player = new Player(name, P2);
     $roomlistview.hide();
   });
+
+  $('#btnCancelRoom').click(function () {
+     $createroomview.hide();
+     $roomlistview.show();
+  });
+
   function updateWaitingScreen(data) {
     $("#resultLabel").html("Das Spiel kann beginnen!");
   }
+
   socket.on("player1", data => {
     game.room = data.room;
     game.player1 = data.room.owner;

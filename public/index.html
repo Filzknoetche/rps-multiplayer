@@ -2,7 +2,7 @@
 <html lang="de" dir="ltr">
   <head>
     <meta charset="utf-8" />
-    <title>Rock Paper Scissors</title>
+    <title>Filzknoetche - Schere Stein Papier</title>
     <link rel="stylesheet" href="style.css" />
     <link
       rel="stylesheet"
@@ -34,7 +34,7 @@
       <div class="roomlist-view" style="display: none;">
         <div class="dialog">
           <h1>Room list</h1>
-          <p>Hallo</p>
+          <p>Benutze "doppel linksklick" um einem Raum beizutreten</p>
           <div class="splitter">
             <div class="list">
               <table class="header">
@@ -47,7 +47,7 @@
                 <thead>
                   <tr>
                     <td>Name</td>
-                    <td>Players</td>
+                    <td>Spieler</td>
                     <td>Pass</td>
                     <td>Host</td>
                   </tr>
@@ -68,10 +68,10 @@
             </div>
             <div class="buttons">
               <button id="btnJoinGame" class="btn btn-primary">
-                Join Room
+                Raum Betreten
               </button>
               <button id="btnCreateGame" class="btn btn-primary">
-                Create Room
+                Raum erstellen
               </button>
             </div>
           </div>
@@ -84,20 +84,33 @@
 
       <div class="create-room-view" style="display:none;">
         <div class="dialog">
-          <h1>Create room</h1>
+          <h1>Raum erstellen</h1>
           <div class="label-input">
-            <label>Room name:</label>
+            <label>Raumname:</label>
             <input id="lobbyNameInput" required="" maxlength="40" />
           </div>
           <div class="label-input">
-            <label>Password:</label>
+            <label>Passwort:</label>
             <input id="lobbyPasswordInput" maxlength="30" />
           </div>
           <div class="row-btn">
-            <button data-hook="cancel">Cancel</button>
-            <button id="btnCreateRoom">Create</button>
+            <button id="btnCancelRoom">Abbrechen</button>
+            <button id="btnCreateRoom">Erstellen</button>
           </div>
         </div>
+      </div>
+      <div class="room-password-view" style="display: none;">
+          <div class="dialog">
+            <h1>Password required</h1>
+            <div class="label-input">
+                <label>Passwort:</label>
+                <input data-hook="input" maxlength="30">
+            </div>
+            <div class="buttons">
+                <button data-hook="cancel">Cancel</button>
+                <button data-hook="ok" disabled="">Ok</button>
+            </div>
+          </div>
       </div>
       <div class="lobby-list page">
         <h3 class="title">Lobby</h3>
@@ -117,7 +130,7 @@
           <span id="p1-score">0</span>:<span id="p2-score">0</span>
         </div>
         <div class="result">
-          <p id="resultLabel">Waiting for opponent...</p>
+          <p id="resultLabel">Warte auf Gegner...</p>
         </div>
         <div class="choices">
           <div class="choice" id="s">
@@ -130,7 +143,7 @@
             <i class="fas fa-hand-paper fa-4x"></i>
           </div>
         </div>
-        <p id="action-message">Waiting for opponent...</p>
+        <p id="action-message">Warte auf Gegner...</p>
       </div>
     </div>
     <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
