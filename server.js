@@ -81,9 +81,9 @@ io.on('connection', (socket) => {
 
     socket.on('hostCreateNewGame', hostCreateNewGame);
     socket.on('playerJoinGame', playerJoinGame);
+    socket.on('playerWantToJoin', playerWantsToJoin);
 
     function hostCreateNewGame(data) {
-        console.log(data);
         // Create a unique Socket.IO Room
         let thisGameId = ( Math.random() * 100000 ) | 0;
         rooms[thisGameId] = {id: data.id, roomid: thisGameId, roomname: data.roomname, owner: data.username, password: data.roompassword};
@@ -108,6 +108,17 @@ io.on('connection', (socket) => {
             socket.emit('player2', { name: data.name, id: data.room, room: test1});
         } else {
             socket.emit('err', { message: 'Sorry, The room is full!' });
+        }
+    }
+    function playerWantsToJoin(data) {
+        var room = io.nsps['/'].adapter.rooms[data.room];
+        if (room && room.length === 1) {
+            let test1 = rooms[data.room];
+            if (test1.password == "") {
+                socket.emit("noPW", test1);
+            }else{
+                socket.emit("pw", test1);
+            }
         }
     }
 
