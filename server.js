@@ -84,14 +84,11 @@ io.on('connection', (socket) => {
 
     function hostCreateNewGame(data) {
         // Create a unique Socket.IO Room
-        //console.log(data);
-        
         let thisGameId = ( Math.random() * 100000 ) | 0;
         rooms[thisGameId] = {id: data.id, roomid: thisGameId, roomname: data.roomname, owner: data.username, password: data.roompassword};
         ++numRooms;
         let user = users[socket.id];
         user.inGame = true;
-        //Object.assign(user, {opponent: data.name});
         // Return the Room ID (gameId) and the socket ID (mySocketId) to the browser client
         socket.emit('newGameCreated', {gameId: thisGameId, mySocketId: data.id, roomname: data.roomname});
         io.in(thisGameId).emit('big-announcement', 'the game will start soon');
@@ -103,10 +100,6 @@ io.on('connection', (socket) => {
     };
 
     function playerJoinGame(data) {
-        // console.log(data);
-        // console.log(rooms[data.room]);
-        
-        // console.log(rooms[data.room]);
         var room = io.nsps['/'].adapter.rooms[data.room];
         if (room && room.length === 1) {
             let test1 = rooms[data.room];
@@ -120,12 +113,13 @@ io.on('connection', (socket) => {
     }
 
     socket.on('playTurn', (data) => {
-        console.log(data);
-        
         socket.broadcast.to(data.room).emit('turnPlayed', {
             choice: data.choice,
             room: data.room,
             player: data.player
         });
+    });
+    socket.on('gameEnded', (data) => {
+        io.in(data.room).emit('gameEnd', data);
     });
 });

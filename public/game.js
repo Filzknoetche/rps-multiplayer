@@ -1,24 +1,24 @@
 $(function() {
-  let FADE_TIME = 150; // ms
   let $window = $(window);
   let $usernameInput = $(".usernameInput"); // Input for username
   let $roomnameInput = $("#lobbyNameInput");
   let $roompasswordInput = $("#lobbyPasswordInput");
-  let $loginPage = $(".login.page"); // The login page
-  let $gamePage = $(".game.page"); // The login page
-  let $lobbyPage = $(".lobby.page"); // The login page
-  let $lobbycreatePage = $(".lobby-create.page");
+  let $loginPage = $(".login.page");
+  let $gamePage = $(".game.page");
+  let $lobbyPage = $(".lobby.page"); 
   let $createroomview = $(".create-room-view");
-  let $gamecreatedPage = $(".game-created.page"); // The login page
-  let $lobbylistPage = $(".lobby-list.page"); // The login page
+  let $lobbylistPage = $(".lobby-list.page");
   let $roomlistview = $(".roomlist-view");
   let $userlabel = $("#user-label");
   let $opponentLabel = $("#computer-label");
-  let $gameiddisplay = $("#gameid-display");
   let $currentInput = $usernameInput.focus();
   let useronline = $("#user-online span");
   let usersonline = $("#users-online");
   let $roomNameAndId = $("#room");
+  const result_p = document.querySelector(".result > p");
+  let $actionmessage = $('#action-message');
+  const p1Score_span = $("#p1-score");
+  const p2Score_span = $("#p2-score");
   let username;
   let userid;
   let id;
@@ -58,9 +58,7 @@ $(function() {
       const message = turn
         ? "Dein Zug"
         : "Warte bis dein Gegner seine Auswahl getroffen hat!";
-      //$('#turn').text(message);
-      $("#resultLabel").html(message);
-      console.log(message);
+      $actionmessage.html(message);
     }
 
     getPlayerName() {
@@ -87,7 +85,10 @@ $(function() {
       this.choices = [];
       this.p1choice;
       this.p2choice;
-      this.board = [];
+      this.player1;
+      this.player2;
+      this.player1Score = 0;
+      this.player2Score = 0;
       this.moves = 0;
     }
     getRoomId() {
@@ -104,8 +105,6 @@ $(function() {
     }
 
     updateBoard(type, choice) {
-      //console.log(type + " " + choice);
-      this.choices.push(choice);
       if (type == P1) {
         this.p1choice = choice;
       }
@@ -143,14 +142,12 @@ $(function() {
 
         //console.log(choice);
 
-        document.getElementById(choice).classList.add("green-glow");
+        document.getElementById(choice).classList.add("gray-glow");
 
         // Update board after your turn.
         game.playTurn(choice);
-        //   game.updateBoard(player.getPlayerType(), row, col, this.id);
 
         player.setCurrentTurn(false);
-        //player.updatePlaysArr(1 << ((row * 3) + col));
 
         game.checkWinner();
       }
@@ -167,41 +164,59 @@ $(function() {
     }
 
     checkWinner() {
-      if (game.p1choice != null && game.p2choice) {
-        console.log(game.p1choice + " " + game.p2choice);
-        console.log(room);
-
+        console.log(game.p1choice);
+        console.log(game.p2choice);
+      if (game.p1choice != undefined && game.p2choice != undefined) {
         switch (game.p1choice + game.p2choice) {
           case "rs":
           case "pr":
           case "sp":
-            //win(userChoice, computerChoice);
-            console.log("P1 win");
-            win(game.p1choice, game.p2choice, player.getPlayerName());
+            //console.log("P1 win");
+            win(game.p1choice, game.p2choice, game.player1);
             break;
           case "rp":
           case "ps":
           case "sr":
-            //lose(userChoice, computerChoice);
-            console.log("P2 win");
-            win(game.p1choice, game.p2choice, player.getPlayerName());
+            //console.log("P2 win");
+            win(game.p1choice, game.p2choice, game.player2);
             break;
           case "rr":
           case "pp":
           case "ss":
-            //draw(userChoice, computerChoice);
-            console.log("DRAW");
+            //console.log("DRAW");
             win(game.p1choice, game.p2choice, "draw");
             break;
         }
       }
       function win(p1choice, p2choice, winner) {
-        console.log(p1choice);
-        console.log(p2choice);
-        console.log(winner);
+          switch (winner) {
+              case game.player1:
+                  game.player1Score++;
+                  break;
+              case game.player2:
+                  game.player2Score++;
+                  break;
+              default:
+                  break;
+          }
+        socket.emit('gameEnded', {
+            room: game.getRoomId(),
+            p1choice: p1choice,
+            p2choice: p2choice,
+            winner: winner,
+            p1score : game.player1Score,
+            p2score : game.player2Score
+          });
+          
       }
     }
   }
+
+  function convertToWord(letter) {
+    if (letter == "r") return "Stein";
+    if (letter == "p") return "Papier";
+    return "Schere";
+}
 
   const addParticipantsMessage = data => {
     useronline.html(data.numUsers);
@@ -343,13 +358,50 @@ $(function() {
   });
 
   socket.on("turnPlayed", data => {
-    //console.log(data);
+    console.log(data);
 
     const opponentType = player.getPlayerType() === P1 ? P2 : P1;
     //console.log(opponentType);
     game.updateBoard(opponentType, data.choice);
     player.setCurrentTurn(true);
     //console.log(player);
+  });
+
+  socket.on('gameEnd', (data) => {
+      console.log(data);
+      const smallP1Word = game.player1.fontsize(3).sub();
+      const smallP2Word = game.player2.fontsize(3).sub();
+      if (data.winner == game.player1) {
+        result_p.innerHTML = `${convertToWord(data.p1choice)}${smallP1Word} schlägt ${convertToWord(data.p2choice)}${smallP2Word}. ${game.player1} gewinnt!`;
+        document.getElementById(data.p1choice).classList.remove('gray-glow');
+        document.getElementById(data.p2choice).classList.remove('gray-glow');
+        document.getElementById(data.p1choice).classList.add('green-glow');
+        document.getElementById(data.p2choice).classList.add('red-glow');
+        setTimeout(function () {
+            document.getElementById(data.p1choice).classList.remove('green-glow');
+            document.getElementById(data.p2choice).classList.remove('red-glow');
+        }, 1000);
+      }
+      if (data.winner == game.player2) {
+        result_p.innerHTML = `${convertToWord(data.p2choice)}${smallP2Word} schlägt ${convertToWord(data.p1choice)}${smallP1Word}. ${game.player2} gewinnt!`;
+        document.getElementById(data.p1choice).classList.remove('gray-glow');
+        document.getElementById(data.p2choice).classList.remove('gray-glow');
+        document.getElementById(data.p2choice).classList.add('green-glow');
+        document.getElementById(data.p1choice).classList.add('red-glow');
+        setTimeout(function () {
+            document.getElementById(data.p2choice).classList.remove('green-glow');
+            document.getElementById(data.p1choice).classList.remove('red-glow');
+        }, 1000);
+      }
+      if (data.winner == "draw") {
+        result_p.innerHTML = `${convertToWord(data.p1choice)}${smallP1Word} gleich ${convertToWord(data.p2choice)}${smallP2Word}. Unentschieden.`;
+        document.getElementById(data.p1choice).classList.remove('gray-glow');
+        document.getElementById(data.p2choice).classList.remove('gray-glow');
+      }
+      p1Score_span.html(data.p1score);
+      p2Score_span.html(data.p2score);
+      game.p1choice = null;
+      game.p2choice = null;
   });
 
   $("#btnCreateGame").click(function() {
@@ -416,13 +468,13 @@ $(function() {
   });
   function updateWaitingScreen(data) {
     //console.log("updateWaitingScreen");
-    $("#resultLabel").html("Das Spiel kann beginnen");
+    $("#resultLabel").html("Das Spiel kann beginnen!");
     //console.log(data);
   }
   socket.on("player1", data => {
-    const message = `Hello, ${player.getPlayerName()}`;
-    //console.log(message);
-    //console.log(data);
+    game.room = data.room;
+    game.player1 = data.room.owner;
+    game.player2 = data.room.opponent;
     $opponentLabel.html(data.name);
     updateWaitingScreen(data);
     player.setCurrentTurn(true);
@@ -433,13 +485,14 @@ $(function() {
    * This event is received when P2 successfully joins the game room.
    */
   socket.on("player2", data => {
-    //console.log(data);
     updateWaitingScreen(data);
     const message = `Hello, ${data.name}`;
     //console.log(message);
     // Create game for player 2
     game = new Game(data.room.roomid, data.room.roomname);
-    //console.log(game);
+    game.player1 = data.room.owner;
+    game.player2 = data.room.opponent;
+    game.room = data.room;
     $userlabel.html(data.room.owner);
     $roomNameAndId.html(data.room.roomname + "/" + data.room.roomid);
     game.displayBoard(message);
