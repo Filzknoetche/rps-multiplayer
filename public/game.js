@@ -350,6 +350,8 @@ $(function() {
   });
 
   socket.on("update-lobbylist", data => {
+    console.log(data);
+    
     let pw = data.rooms.password == "" ? "Nein" : "ja";
 
     $("#rooms").append(

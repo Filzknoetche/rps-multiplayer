@@ -2,7 +2,7 @@
 <html lang="de" dir="ltr">
   <head>
     <meta charset="utf-8" />
-    <title>Filzknoetche - Schere Stein Papier</title>
+    <title>Schere Stein Papier</title>
     <link rel="stylesheet" href="style.css" />
     <link
       rel="stylesheet"
@@ -87,11 +87,11 @@
           <h1>Raum erstellen</h1>
           <div class="label-input">
             <label>Raumname:</label>
-            <input id="lobbyNameInput" required="" maxlength="40" />
+            <input id="lobbyNameInput" required="" maxlength="10" />
           </div>
           <div class="label-input">
             <label>Passwort:</label>
-            <input id="lobbyPasswordInput" maxlength="30" />
+            <input id="lobbyPasswordInput" maxlength="10" />
           </div>
           <div class="row-btn">
             <button id="btnCancelRoom">Abbrechen</button>
@@ -100,17 +100,17 @@
         </div>
       </div>
       <div class="room-password-view" style="display:none;">
-          <div class="dialog">
-            <h1>Password required</h1>
-            <div class="label-input">
-                <label>Passwort:</label>
-                <input id="InputPw" maxlength="30">
-            </div>
-            <div class="buttons">
-                <button id="btnCancelPw">Cancel</button>
-                <button id="btnCheckPw" disabled="">Ok</button>
-            </div>
+        <div class="dialog">
+          <h1>Password required</h1>
+          <div class="label-input">
+            <label>Passwort:</label>
+            <input id="InputPw" maxlength="30" />
           </div>
+          <div class="buttons">
+            <button id="btnCancelPw">Cancel</button>
+            <button id="btnCheckPw" disabled="">Ok</button>
+          </div>
+        </div>
       </div>
       <div class="disconnected-view" style="display: none;">
         <div class="dialog basic-dialog">
