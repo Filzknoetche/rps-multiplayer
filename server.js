@@ -82,6 +82,7 @@ io.on('connection', (socket) => {
     socket.on('hostCreateNewGame', hostCreateNewGame);
     socket.on('playerJoinGame', playerJoinGame);
     socket.on('playerWantToJoin', playerWantsToJoin);
+    socket.on('enterPw', enterPw);
 
     function hostCreateNewGame(data) {
         // Create a unique Socket.IO Room
@@ -119,6 +120,13 @@ io.on('connection', (socket) => {
             }else{
                 socket.emit("pw", test1);
             }
+        }
+    }
+    function enterPw(data) {
+        if (data.pw == rooms[data.room].password) {
+            socket.emit("pwcorrect", rooms[data.room]);
+        }else{
+            socket.emit("pwincorrect", rooms[data.room]);
         }
     }
 

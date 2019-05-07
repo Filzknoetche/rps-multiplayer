@@ -104,13 +104,22 @@
             <h1>Password required</h1>
             <div class="label-input">
                 <label>Passwort:</label>
-                <input data-hook="input" maxlength="30">
+                <input id="InputPw" maxlength="30">
             </div>
             <div class="buttons">
                 <button id="btnCancelPw">Cancel</button>
-                <button data-hook="ok" disabled="">Ok</button>
+                <button id="btnCheckPw" disabled="">Ok</button>
             </div>
           </div>
+      </div>
+      <div class="disconnected-view" style="display: none;">
+        <div class="dialog basic-dialog">
+          <h1>Disconnected</h1>
+          <p id="reason">Wrong password.</p>
+          <div class="buttons">
+            <button id="btnOk">Ok</button>
+          </div>
+        </div>
       </div>
       <div class="lobby-list page">
         <h3 class="title">Lobby</h3>

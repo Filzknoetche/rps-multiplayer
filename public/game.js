@@ -5,19 +5,20 @@ $(function() {
   let $roompasswordInput = $("#lobbyPasswordInput");
   let $loginPage = $(".login.page");
   let $gamePage = $(".game.page");
-  let $lobbyPage = $(".lobby.page"); 
+  let $lobbyPage = $(".lobby.page");
   let $createroomview = $(".create-room-view");
-  let $roompasswordview = $('.room-password-view');
+  let $roompasswordview = $(".room-password-view");
   let $lobbylistPage = $(".lobby-list.page");
   let $roomlistview = $(".roomlist-view");
   let $userlabel = $("#user-label");
+  let $disconnectedview = $('.disconnected-view');
   let $opponentLabel = $("#computer-label");
   let $currentInput = $usernameInput.focus();
   let useronline = $("#user-online span");
   let usersonline = $("#users-online");
   let $roomNameAndId = $("#room");
   const result_p = document.querySelector(".result > p");
-  let $actionmessage = $('#action-message');
+  let $actionmessage = $("#action-message");
   const p1Score_span = $("#p1-score");
   const p2Score_span = $("#p2-score");
   let username;
@@ -183,25 +184,24 @@ $(function() {
         }
       }
       function win(p1choice, p2choice, winner) {
-          switch (winner) {
-              case game.player1:
-                  game.player1Score++;
-                  break;
-              case game.player2:
-                  game.player2Score++;
-                  break;
-              default:
-                  break;
-          }
-        socket.emit('gameEnded', {
-            room: game.getRoomId(),
-            p1choice: p1choice,
-            p2choice: p2choice,
-            winner: winner,
-            p1score : game.player1Score,
-            p2score : game.player2Score
-          });
-          
+        switch (winner) {
+          case game.player1:
+            game.player1Score++;
+            break;
+          case game.player2:
+            game.player2Score++;
+            break;
+          default:
+            break;
+        }
+        socket.emit("gameEnded", {
+          room: game.getRoomId(),
+          p1choice: p1choice,
+          p2choice: p2choice,
+          winner: winner,
+          p1score: game.player1Score,
+          p2score: game.player2Score
+        });
       }
     }
   }
@@ -210,7 +210,7 @@ $(function() {
     if (letter == "r") return "Stein";
     if (letter == "p") return "Papier";
     return "Schere";
-}
+  }
 
   const addParticipantsMessage = data => {
     useronline.html(data.numUsers);
@@ -224,7 +224,7 @@ $(function() {
     addRooms(data);
 
     for (let roomid in data.rooms) {
-        let pw = data.rooms[roomid].password == "" ? "Nein" : "ja";
+      let pw = data.rooms[roomid].password == "" ? "Nein" : "ja";
       $("#rooms").append(
         "<tr><td data-room=" +
           data.rooms[roomid].roomid +
@@ -232,7 +232,9 @@ $(function() {
           data.rooms[roomid].roomid +
           "</td><td>" +
           data.rooms[roomid].roomname +
-          "</td><td>1/2</td><td>"+pw+"</td><td>" +
+          "</td><td>1/2</td><td>" +
+          pw +
+          "</td><td>" +
           data.rooms[roomid].owner +
           "</td></tr>"
       );
@@ -277,8 +279,7 @@ $(function() {
     log("you have been disconnected");
   });
   // Log a message
-  const log = (message, options) => {
-  };
+  const log = (message, options) => {};
 
   // Whenever the server emits 'login', log the login message
   socket.on("login", data => {
@@ -324,21 +325,33 @@ $(function() {
   });
 
   socket.on("pw", data => {
-    console.log(data);
     $roomlistview.hide();
     $roompasswordview.show();
+    $("#InputPw").data("room", data.roomid);
   });
   socket.on("noPW", data => {
-    console.log(data);
     const name = username;
     socket.emit("playerJoinGame", { name, room: data.roomid });
     player = new Player(name, P2);
     $roomlistview.hide();
   });
 
+  socket.on("pwcorrect", data => {
+    const name = username;
+    socket.emit("playerJoinGame", { name, room: data.roomid });
+    player = new Player(name, P2);
+    $roompasswordview.hide();
+  });
+  
+  socket.on("pwincorrect", data => {
+    $roompasswordview.hide();
+    $('#reason').html("Falsches Passwort");
+    $disconnectedview.show();
+  });
+
   socket.on("update-lobbylist", data => {
-      let pw = data.rooms.password == "" ? "Nein" : "ja";
-      
+    let pw = data.rooms.password == "" ? "Nein" : "ja";
+
     $("#rooms").append(
       "<tr><td data-room=" +
         data.rooms.roomid +
@@ -346,7 +359,9 @@ $(function() {
         data.rooms.roomid +
         "</td><td>" +
         data.rooms.roomname +
-        "</td><td>1/2</td><td>"+pw+"</td><td>" +
+        "</td><td>1/2</td><td>" +
+        pw +
+        "</td><td>" +
         data.rooms.owner +
         "</td></tr>"
     );
@@ -359,44 +374,56 @@ $(function() {
     player.setCurrentTurn(true);
   });
 
-  socket.on('gameEnd', (data) => {
-      const smallP1Word = game.player1.fontsize(3).sub();
-      const smallP2Word = game.player2.fontsize(3).sub();
-      if (data.winner == game.player1) {
-        result_p.innerHTML = `${convertToWord(data.p1choice)}${smallP1Word} schlägt ${convertToWord(data.p2choice)}${smallP2Word}. ${game.player1} gewinnt!`;
-        document.getElementById(data.p1choice).classList.remove('gray-glow');
-        document.getElementById(data.p2choice).classList.remove('gray-glow');
-        document.getElementById(data.p1choice).classList.add('green-glow');
-        document.getElementById(data.p2choice).classList.add('red-glow');
-        setTimeout(function () {
-            document.getElementById(data.p1choice).classList.remove('green-glow');
-            document.getElementById(data.p2choice).classList.remove('red-glow');
-        }, 1000);
-      }
-      if (data.winner == game.player2) {
-        result_p.innerHTML = `${convertToWord(data.p2choice)}${smallP2Word} schlägt ${convertToWord(data.p1choice)}${smallP1Word}. ${game.player2} gewinnt!`;
-        document.getElementById(data.p1choice).classList.remove('gray-glow');
-        document.getElementById(data.p2choice).classList.remove('gray-glow');
-        document.getElementById(data.p2choice).classList.add('green-glow');
-        document.getElementById(data.p1choice).classList.add('red-glow');
-        setTimeout(function () {
-            document.getElementById(data.p2choice).classList.remove('green-glow');
-            document.getElementById(data.p1choice).classList.remove('red-glow');
-        }, 1000);
-      }
-      if (data.winner == "draw") {
-        result_p.innerHTML = `${convertToWord(data.p1choice)}${smallP1Word} gleich ${convertToWord(data.p2choice)}${smallP2Word}. Unentschieden.`;
-        document.getElementById(data.p2choice).classList.add('gray-glow');
-        document.getElementById(data.p1choice).classList.add('gray-glow');
-        setTimeout(function () {
-            document.getElementById(data.p2choice).classList.remove('gray-glow');
-            document.getElementById(data.p1choice).classList.remove('gray-glow');
-        }, 1000);
-      }
-      p1Score_span.html(data.p1score);
-      p2Score_span.html(data.p2score);
-      game.p1choice = null;
-      game.p2choice = null;
+  socket.on("gameEnd", data => {
+    const smallP1Word = game.player1.fontsize(3).sub();
+    const smallP2Word = game.player2.fontsize(3).sub();
+    if (data.winner == game.player1) {
+      result_p.innerHTML = `${convertToWord(
+        data.p1choice
+      )}${smallP1Word} schlägt ${convertToWord(data.p2choice)}${smallP2Word}. ${
+        game.player1
+      } gewinnt!`;
+      document.getElementById(data.p1choice).classList.remove("gray-glow");
+      document.getElementById(data.p2choice).classList.remove("gray-glow");
+      document.getElementById(data.p1choice).classList.add("green-glow");
+      document.getElementById(data.p2choice).classList.add("red-glow");
+      setTimeout(function() {
+        document.getElementById(data.p1choice).classList.remove("green-glow");
+        document.getElementById(data.p2choice).classList.remove("red-glow");
+      }, 1000);
+    }
+    if (data.winner == game.player2) {
+      result_p.innerHTML = `${convertToWord(
+        data.p2choice
+      )}${smallP2Word} schlägt ${convertToWord(data.p1choice)}${smallP1Word}. ${
+        game.player2
+      } gewinnt!`;
+      document.getElementById(data.p1choice).classList.remove("gray-glow");
+      document.getElementById(data.p2choice).classList.remove("gray-glow");
+      document.getElementById(data.p2choice).classList.add("green-glow");
+      document.getElementById(data.p1choice).classList.add("red-glow");
+      setTimeout(function() {
+        document.getElementById(data.p2choice).classList.remove("green-glow");
+        document.getElementById(data.p1choice).classList.remove("red-glow");
+      }, 1000);
+    }
+    if (data.winner == "draw") {
+      result_p.innerHTML = `${convertToWord(
+        data.p1choice
+      )}${smallP1Word} gleich ${convertToWord(
+        data.p2choice
+      )}${smallP2Word}. Unentschieden.`;
+      document.getElementById(data.p2choice).classList.add("gray-glow");
+      document.getElementById(data.p1choice).classList.add("gray-glow");
+      setTimeout(function() {
+        document.getElementById(data.p2choice).classList.remove("gray-glow");
+        document.getElementById(data.p1choice).classList.remove("gray-glow");
+      }, 1000);
+    }
+    p1Score_span.html(data.p1score);
+    p2Score_span.html(data.p2score);
+    game.p1choice = null;
+    game.p2choice = null;
   });
 
   $("#btnCreateGame").click(function() {
@@ -407,6 +434,10 @@ $(function() {
   $("#btnJoinGame").click(function() {
     $roomlistview.hide();
     $lobbylistPage.show();
+  });
+  $('#btnOk').click(function () {
+    $disconnectedview.hide();
+    $roomlistview.show();
   });
   $("#btnCreateRoom").click(function() {
     roomname = cleanInput($roomnameInput.val().trim());
@@ -454,19 +485,31 @@ $(function() {
     const roomID = $(this)
       .children()
       .data("room");
-    
+
     socket.emit("playerWantToJoin", { name, room: roomID });
   });
 
-  $('#btnCancelRoom').click(function () {
-     $createroomview.hide();
-     $roomlistview.show();
+  $("#btnCancelRoom").on("click", function(event) {
+    $createroomview.hide();
+    $roomlistview.show();
   });
 
-  $('#btnCancelPw').click(function () {
+  $("#btnCancelPw").on("click", function(event) {
     $roompasswordview.hide();
     $roomlistview.show();
- });
+  });
+  $("#btnCheckPw").click(function() {
+    let pw = cleanInput($("#InputPw").val());
+    socket.emit("enterPw", { pw, room: $("#InputPw").data("room") });
+  });
+  $("#InputPw").on("input", function() {
+    // do something
+    if ($("#InputPw").val().length > 0) {
+      $("#btnCheckPw").removeAttr("disabled");
+    } else {
+      $("#btnCheckPw").attr("disabled", true);
+    }
+  });
 
   function updateWaitingScreen(data) {
     $("#resultLabel").html("Das Spiel kann beginnen!");

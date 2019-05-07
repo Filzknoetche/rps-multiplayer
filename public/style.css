@@ -660,3 +660,46 @@ table {
 .dialog button:disabled, .room-view>.container button:disabled {
     background-color: #3e3e3e;
 }
+.disconnected-view {
+    position: absolute;
+    width: 100%;
+    height: 85%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.disconnected-view .dialog, .disconnected-view .room-view>.container {
+    width: 300px;
+}
+.dialog, .room-view>.container {
+    background-color: #1A2125;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    padding: 10px;
+    overflow: hidden;
+    box-sizing: border-box;
+    border-radius: 5px;
+}
+.disconnected-view .dialog>p, .disconnected-view .room-view>.container>p {
+    margin-bottom: 20px;
+}
+.basic-dialog p {
+    line-height: 1.4em;
+    color: #fff;
+}
+.basic-dialog .buttons {
+    margin-top: 10px;
+    display: flex;
+}
+.basic-dialog .buttons>:not(:last-child) {
+    margin-right: 6px;
+}
+.basic-dialog .buttons>* {
+    flex: 1;
+    white-space: nowrap;
+}
+.disconnected-view button {
+    width: auto;
+    align-self: flex-end;
+}
