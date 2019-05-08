@@ -107,12 +107,12 @@ io.on('connection', (socket) => {
             socket.join(data.room);
             socket.broadcast.to(data.room).emit('player1', {name: data.name, room: test1});
             socket.emit('player2', { name: data.name, id: data.room, room: test1});
-            io.emit('update-lobbylist', {rooms: rooms[data.room], numRooms: numRooms});
+            io.emit('update-lobbylist', {rooms: rooms[data.room]});
         } else {
             socket.emit('err', { message: 'Sorry, The room is full!' });
         }
     }
-    function playerWantsToJoin(data) {
+    function playerWantsToJoin(data) {        
         var room = io.nsps['/'].adapter.rooms[data.room];
         if (room && room.length === 1) {
             let test1 = rooms[data.room];

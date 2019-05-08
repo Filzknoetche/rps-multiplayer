@@ -225,6 +225,7 @@ $(function() {
 
     for (let roomid in data.rooms) {
       let pw = data.rooms[roomid].password == "" ? "Nein" : "ja";
+      let players = data.rooms[roomid].opponent == null ? "1" : "2";
       $("#rooms").append(
         "<tr><td data-room=" +
           data.rooms[roomid].roomid +
@@ -232,7 +233,7 @@ $(function() {
           data.rooms[roomid].roomid +
           "</td><td>" +
           data.rooms[roomid].roomname +
-          "</td><td>1/2</td><td>" +
+          "</td><td id='players-"+data.rooms[roomid].roomid+"'>"+players+"/2</td><td>" +
           pw +
           "</td><td>" +
           data.rooms[roomid].owner +
@@ -350,24 +351,26 @@ $(function() {
   });
 
   socket.on("update-lobbylist", data => {
-    console.log(data);
-    
-    let pw = data.rooms.password == "" ? "Nein" : "ja";
-
-    $("#rooms").append(
-      "<tr><td data-room=" +
-        data.rooms.roomid +
-        ' style="display: none">' +
-        data.rooms.roomid +
-        "</td><td>" +
-        data.rooms.roomname +
-        "</td><td>1/2</td><td>" +
-        pw +
-        "</td><td>" +
-        data.rooms.owner +
-        "</td></tr>"
-    );
-    $("#rooms-online").html(data.numRooms);
+    if (data.numRooms == null) {
+      $("#players-"+data.rooms.roomid).html("2/2");
+    }else{
+      let pw = data.rooms.password == "" ? "Nein" : "ja";
+      let players = data.rooms.opponent == null ? "1" : "2";
+      $("#rooms").append(
+        "<tr><td data-room=" +
+          data.rooms.roomid +
+          ' style="display: none">' +
+          data.rooms.roomid +
+          "</td><td>" +
+          data.rooms.roomname +
+          "</td><td id='players-"+data.rooms.roomid+"'>"+players+"/2</td><td>" +
+          pw +
+          "</td><td>" +
+          data.rooms.owner +
+          "</td></tr>"
+      );
+      $("#rooms-online").html(data.numRooms);
+    }
   });
 
   socket.on("turnPlayed", data => {
