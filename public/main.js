@@ -535,7 +535,6 @@ $(function() {
    */
   socket.on("player2", data => {
     updateWaitingScreen(data);
-    const message = `Hello, ${data.name}`;
     // Create game for player 2
     game = new Game(data.room.roomid, data.room.roomname);
     game.player1 = data.room.owner;
@@ -543,12 +542,13 @@ $(function() {
     game.room = data.room;
     $userlabel.html(data.room.owner);
     $roomNameAndId.html(data.room.roomname + "/" + data.room.roomid);
-    game.displayBoard(message);
+    game.displayBoard();
     $opponentLabel.html(player.getPlayerName());
     player.setCurrentTurn(false);
   });
 
   socket.on("err", data => {
-    console.log(data);
+    $('#reason').html(data.message);
+    $disconnectedview.show();
   });
 });

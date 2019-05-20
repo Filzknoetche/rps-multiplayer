@@ -56,13 +56,18 @@ io.on('connection', (socket) => {
         if (addedUser) {
             let userroom;
             --numUsers;
-            //process.stdout.write("" + numUsers +" users\r");
-            if (users[socket.id].inGame) {
+            if (users[socket.id].inGame) {                
                 for (let roomid in rooms) {
                     if (rooms[roomid].id == socket.id) {
                         userroom = rooms[roomid];
                         delete rooms[roomid];
                         --numRooms;
+                    }else if(rooms[roomid].opponent == socket.username){
+                        console.log("lul");
+                        //TODO
+                        //Sende an Host nachricht das Spieler verlassen hat und setzte so den Raum zurück
+                        //Aktuallisiere lobby liste
+                        
                     }
                 }
                 
@@ -102,6 +107,8 @@ io.on('connection', (socket) => {
     function playerJoinGame(data) {
         var room = io.nsps['/'].adapter.rooms[data.room];
         if (room && room.length === 1) {
+            let user = users[socket.id];
+            user.inGame = true;
             let test1 = rooms[data.room];
             Object.assign(test1, {opponent: data.name});
             socket.join(data.room);
@@ -109,7 +116,7 @@ io.on('connection', (socket) => {
             socket.emit('player2', { name: data.name, id: data.room, room: test1});
             io.emit('update-lobbylist', {rooms: rooms[data.room]});
         } else {
-            socket.emit('err', { message: 'Sorry, The room is full!' });
+            socket.emit('err', { message: 'Sorry, der Raum ist voll!' });
         }
     }
     function playerWantsToJoin(data) {        
