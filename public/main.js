@@ -224,7 +224,7 @@ $(function() {
     addRooms(data);
 
     for (let roomid in data.rooms) {
-      let pw = data.rooms[roomid].password == "" ? "Nein" : "ja";
+      let pw = !data.rooms[roomid].password ? "Nein" : "Ja";
       let players = data.rooms[roomid].opponent == null ? "1" : "2";
       $("#rooms").append(
         "<tr><td data-room=" +

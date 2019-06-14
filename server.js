@@ -18,6 +18,7 @@ let numRooms = 0;
 let id = 1;
 let users = {};
 let rooms = {};
+let roompasswords = {};
 
 io.on('connection', (socket) => {
     let addedUser = false;
@@ -35,7 +36,6 @@ io.on('connection', (socket) => {
         socket.userid = userid;
         ++numUsers;
         addedUser = true;
-        //process.stdout.write("" + numUsers +" users\r");
         socket.emit('login', {
             username: username,
             id:userid,
@@ -62,15 +62,19 @@ io.on('connection', (socket) => {
                         userroom = rooms[roomid];
                         delete rooms[roomid];
                         --numRooms;
+                        
                     }else if(rooms[roomid].opponent == socket.username){
                         console.log("lul");
+                        delete rooms[roomid].opponent;
                         //TODO
                         //Sende an Host nachricht das Spieler verlassen hat und setzte so den Raum zurück
                         //Aktuallisiere lobby liste
+
+                        //opponent vom raum zurücksetzten
+                        //An host schicken das benutzer weg ist
                         
                     }
                 }
-                
             }
             delete users[socket.id];
             
@@ -92,7 +96,8 @@ io.on('connection', (socket) => {
     function hostCreateNewGame(data) {
         // Create a unique Socket.IO Room
         let thisGameId = ( Math.random() * 100000 ) | 0;
-        rooms[thisGameId] = {id: data.id, roomid: thisGameId, roomname: data.roomname, owner: data.username, password: data.roompassword};
+        rooms[thisGameId] = {id: data.id, roomid: thisGameId, roomname: data.roomname, owner: data.username, password: (data.roompassword == "" ? false : true)};
+        roompasswords[thisGameId] = {id: data.id, roomid: thisGameId, password: data.roompassword};
         ++numRooms;
         let user = users[socket.id];
         user.inGame = true;
@@ -101,7 +106,6 @@ io.on('connection', (socket) => {
         io.emit('update-lobbylist', {rooms: rooms[thisGameId], numRooms: numRooms});
         // Join the Room and wait for the players
         socket.join(thisGameId.toString());
-        
     };
 
     function playerJoinGame(data) {
@@ -123,7 +127,7 @@ io.on('connection', (socket) => {
         var room = io.nsps['/'].adapter.rooms[data.room];
         if (room && room.length === 1) {
             let test1 = rooms[data.room];
-            if (test1.password == "") {
+            if (!test1.password) {
                 socket.emit("noPW", test1);
             }else{
                 socket.emit("pw", test1);
@@ -131,7 +135,7 @@ io.on('connection', (socket) => {
         }
     }
     function enterPw(data) {
-        if (data.pw == rooms[data.room].password) {
+        if (data.pw == roompasswords[data.room].password) {
             socket.emit("pwcorrect", rooms[data.room]);
         }else{
             socket.emit("pwincorrect", rooms[data.room]);
