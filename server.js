@@ -66,6 +66,9 @@ io.on('connection', (socket) => {
                     }else if(rooms[roomid].opponent == socket.username){
                         console.log("lul");
                         delete rooms[roomid].opponent;
+                        console.log(rooms);
+                        socket.broadcast.to(roomid).emit('opponentLeft', {});
+                        
                         //TODO
                         //Sende an Host nachricht das Spieler verlassen hat und setzte so den Raum zurück
                         //Aktuallisiere lobby liste

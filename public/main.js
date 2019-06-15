@@ -350,6 +350,11 @@ $(function() {
     $disconnectedview.show();
   });
 
+  socket.on("opponentLeft", data => {
+    console.log(data);
+    
+  });
+
   socket.on("update-lobbylist", data => {
     if (data.numRooms == null) {
       $("#players-"+data.rooms.roomid).html("2/2");
@@ -447,7 +452,6 @@ $(function() {
   $("#btnCreateRoom").click(function() {
     roomname = cleanInput($roomnameInput.val().trim());
     roompassword = cleanInput($roompasswordInput.val().trim());
-    console.log(roompassword);
     if (roomname.length >= 1) {
       var data = {
         username: player.getPlayerName(),
