@@ -707,3 +707,20 @@ table {
     width: auto;
     align-self: flex-end;
 }
+
+#footer {
+  color: #fff;
+  text-align: center;
+  width: 100%;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+}
+
+@media only screen and (max-height: 600px){
+  #footer {
+    margin-top: 50px;
+    position: relative;
+    bottom: 0;
+  }
+}
