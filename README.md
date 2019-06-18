@@ -18,3 +18,4 @@ node server.js
 - Invite link
 - beitreten mit invite link
 - timer?
+- Modus (best of 3/5/x)
