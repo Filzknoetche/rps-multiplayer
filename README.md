@@ -13,3 +13,8 @@ node server.js
 
 ->localhost:3003
 ```
+
+## TODO
+- Invite link
+- beitreten mit invite link
+- timer?
