@@ -19,3 +19,4 @@ node server.js
 - beitreten mit invite link
 - timer?
 - Modus (best of 3/5/x)
+- Startreihenfolge abwechseln
