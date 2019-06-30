@@ -716,11 +716,24 @@ table {
   left: 0;
   bottom: 0;
 }
-
+#footer a{
+    color: #fff;
+    
+    text-decoration: none;
+}
+#footer a:hover{
+    color: #a19d9d;
+    border-bottom: 2px solid #0a3a7a;
+    transition: 0.1s;
+}
+#linkborder{
+    border-bottom: 2px solid #0965dd;
+}
+/* 
 @media only screen and (max-height: 600px){
   #footer {
     margin-top: 50px;
     position: relative;
     bottom: 0;
   }
-}
+} */
